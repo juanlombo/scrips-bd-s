@@ -1,0 +1,18 @@
++========================================================+
+|          -- Deifición de mongo DB  --                  |
++========================================================+
+
+-- MongoDB es una base de datos NoSQL orientada a documentos. 
+-- Almacena datos estructurados de foram JSON, bajo un esquema dinamico llamado BSON
+-- son la unidad basica de organización de la estructura de la información de MongoDB, tiene un pape equivalente a una fila en las bases de datos realacionales.
+-- En general un docuemtnos contiene multiples pares clave-valor. 
+-- Una colecion es un conjunto de documentos agrupados {"edad":34}, {"x":"casa"}
+
+{
+    _id: ObjectId("5099994545df4545d4545bd5454d454f"),
+    name: {firts:"Alana", las:"Mictia"},
+    birth: new Date('Jun 23, 2001'),
+    death: new Date('Jun 07, 1999'),
+    contribs: ["turing machine", "Turing test", "Turingery"],
+    views: NumberLogon(1250000)
+}

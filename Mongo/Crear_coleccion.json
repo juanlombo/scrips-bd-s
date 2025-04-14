@@ -1,0 +1,53 @@
+
+//CREA LA COLECIÓN SIN INSERT EN LA BASE DE DATOS 
+
+// EJEMPLO:
+
+test> post = {"titulo" : "Mi primer post",
+... "contenido" : "Contenido de mi primer blog",
+... "fecha" : new Date()}
+
+//rESULTADO
+{
+  titulo: 'Mi primer post',
+  contenido: 'Contenido de mi primer blog',
+  fecha: ISODate('2025-04-14T01:53:31.591Z')
+}
+
+// INSERTAR COLECCIÓN EN LA BASE DE DATOS
+db.blog.insert(post)
+// EJEMPLO:
+prueba> db.blog.insert(post)
+// RESULTADO
+DeprecationWarning: Collection.insert() is deprecated. Use insertOne, insertMany, or bulkWrite.
+{
+  acknowledged: true,
+  insertedIds: { '0': ObjectId('67fc6abb18f9294b5ab5f899') }
+}
+
+// VER LA COLECCIÓN (Muestra los primeros 20 documentos)
+prueba> db.blog.find()
+// RESULTADO
+
+prueba> db.blog.find()
+[
+  {
+    _id: ObjectId('67fc6abb18f9294b5ab5f899'),
+    titulo: 'Mi primer post',
+    contenido: 'Contenido de mi primer blog',
+    fecha: ISODate('2025-04-14T01:53:31.591Z')
+  }
+]
+
+// MUESTRA EL PRIMER DOCUMENTO DE LA COLECCION
+prueba> db.blog.findOne();
+{
+  _id: ObjectId('67fc6abb18f9294b5ab5f899'),
+  titulo: 'Mi primer post',
+  contenido: 'Contenido de mi primer blog',
+  fecha: ISODate('2025-04-14T01:53:31.591Z')
+}
+
+// AGREGAR NUEVA CLAVE AL DOCUMENTO
+prueba> db.blog.updateOne({titulo: "Mi primer post"},{$set:{comentarios: []}})
+
