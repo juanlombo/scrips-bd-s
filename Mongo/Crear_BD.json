@@ -1,0 +1,14 @@
+// CREA LA BD
+
+test> use prueba
+switched to db prueba
+
+REVISAR EN QUE BD ESTOY PARADO:
+db
+
+// LISTAR TODAS LAS BDS
+show dbs;
+// CONECTARSE A LA BD
+db=conn.getDB("prueba")
+// CONECTARSE A UNA INSTANCIA 
+conn = new Mongo("localhost")
