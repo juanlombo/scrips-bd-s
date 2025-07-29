@@ -51,10 +51,10 @@ rman target/
 -- 3.Reorganiza se lanza desde el rman
 crosscheck archivelog all;
 -- 4.Elimina ultima aplicada desde rman
-delete force archivelog until sequence 419939 thread 1;
-delete force archivelog until sequence 578096 thread 2;
-delete force archivelog until sequence 318957 thread 3;
-delete force archivelog until sequence 217226 thread 4;
+delete force archivelog until sequence 182316 thread 1;
+delete force archivelog until sequence 581440 thread 2;
+delete force archivelog until sequence 321816 thread 3;
+--delete force archivelog until sequence 217226 thread 4;
 ----Reorganiza se lanza desde el rman 
 crosscheck archivelog all;
 
@@ -66,3 +66,8 @@ select process,status,client_process,sequence#,block#,active_agents,known_agents
 
 
 +RECOC1/CKPRDRP/ARCHIVELOG/
+
+
+
+
+select NAME, PATH from v$asm_disk where GROUP_NUMBER=1 order by 1;

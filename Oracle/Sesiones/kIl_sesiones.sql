@@ -1,7 +1,10 @@
 +======================================+
 | Generar Kill de sesiones por SQL ID  |
 +======================================+
-select 'alter system kill session '''||sid||','||serial#||',@'||inst_id||''' immediate;'  FROM GV$SESSION  WHERE SQL_ID = '69y4dncyzk6uz';
+select 'alter system kill session '''||sid||','||serial#||',@'||inst_id||''' immediate;'  FROM GV$SESSION  WHERE SQL_ID = '70upp6rrz0d1k';
+
+SELECT 'ALTER SYSTEM DISCONNECT SESSION ''' || sid || ',' || serial# || ',@' || inst_id || ''' IMMEDIATE;' FROM gv$session WHERE sql_id = '70upp6rrz0d1k';
+
 
 +==========================================+
 |Generar Kill de sesiones con concurrencia |

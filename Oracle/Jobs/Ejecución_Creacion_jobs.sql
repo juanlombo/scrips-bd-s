@@ -26,12 +26,12 @@ END;
 +============================================================================+
 -- Evita que la sesión se bloquee esperando la ejecución del job.
 BEGIN
-  DBMS_SCHEDULER.RUN_JOB(job_name => 'JOB_PROCEDURE_MANT_BCT', use_current_session => FALSE);
+  DBMS_SCHEDULER.RUN_JOB(job_name => 'BCT_KOBA.JOB_PROCEDURE_MANT_BCT', use_current_session => FALSE);
 END;
 /
 
 BEGIN
-  DBMS_SCHEDULER.RUN_JOB(job_name => 'P_ARCHIVAR_TRANSACTIONXML', use_current_session => FALSE);
+  DBMS_SCHEDULER.RUN_JOB(job_name => 'BCT_NATIVA.P_ARCHIVAR_TRANSACTIONXML', use_current_session => FALSE);
 END;
 /
 
@@ -98,7 +98,7 @@ order by next_run_date desc
 
 SELECT job_name, state, enabled
 FROM dba_scheduler_jobs
-WHERE job_name IN ('JOB_PROCEDURE_MANT_BCT','P_ARCHIVAR_TRANSACTIONXML');
+WHERE job_name IN ('clearing');
 
 
 +============================================================================+

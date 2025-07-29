@@ -30,7 +30,7 @@ oracleasm scandisks
 --Con usuario Oracle, Validar los discos que pertenecen al disgroup al DG en este caso DG_DAT_PROD y en esa ruta agregarla al alter siguiente a la validación
 
 set lines 255
-col path for a38
+col path for a45
 col Diskgroup for a18
 col DiskName for a22
 col disk# for 999
@@ -43,7 +43,7 @@ set pages 255
 select a.name DiskGroup, b.disk_number Disk#, b.name DiskName, b.total_mb, b.free_mb, b.path, b.header_status, a.type
 from v$asm_disk b, v$asm_diskgroup a
 where a.group_number (+) =b.group_number
---and a.name = 'DG_DAT_PROD'
+and a.name = 'ARCHIVE'
 order by b.group_number,  b.name,b.disk_number
 /
 
@@ -89,8 +89,24 @@ DG_DAT_PROD            1 DG_DAT_PROD_0001            204,800       18,891 /dev/o
 --Con usuario GRID
 sqlplus / as sysasm
 
-ALTER DISKGROUP DG_DAT_PROD ADD DISK '/dev/oracleasm/disks/PRIDATA_41' NAME PRIDATA_41 rebalance power 10;-- esperar que finalice para lanzar el otro
+ALTER DISKGROUP DG_DAT_PROD ADD DISK '/dev/oracleasm/disks/HIT_1525_DG_ARCHIVE_19' NAME ARCHIVE_19 rebalance power 10;-- esperar que finalice para lanzar el otro
 SELECT * FROM V$ASM_OPERATION;
+
+ALTER DISKGROUP DG_DAT_PROD ADD DISK '/dev/oracleasm/disks/HIT_1525_DG_ARCHIVE_19' NAME ARCHIVE_19, '/dev/oracleasm/disks/HIT_1526_DG_ARCHIVE_20' NAME ARCHIVE_20, '/dev/oracleasm/disks/HIT_1527_DG_ARCHIVE_21' NAME ARCHIVE_21, '/dev/oracleasm/disks/HIT_1528_DG_ARCHIVE_22' NAME ARCHIVE_22, '/dev/oracleasm/disks/HIT_1529_DG_ARCHIVE_23' NAME ARCHIVE_23, '/dev/oracleasm/disks/HIT_152A_DG_ARCHIVE_24' NAME ARCHIVE_24 rebalance power 10;
+
+
+ALTER DISKGROUP ARCHIVE ADD 
+DISK 
+'/dev/oracleasm/disks/HIT_1525_DG_ARCHIVE_19' NAME ARCHIVE_19,
+'/dev/oracleasm/disks/HIT_1526_DG_ARCHIVE_20' NAME ARCHIVE_20,
+'/dev/oracleasm/disks/HIT_1527_DG_ARCHIVE_21' NAME ARCHIVE_21,
+'/dev/oracleasm/disks/HIT_1528_DG_ARCHIVE_22' NAME ARCHIVE_22,
+'/dev/oracleasm/disks/HIT_1529_DG_ARCHIVE_23' NAME ARCHIVE_23,
+'/dev/oracleasm/disks/HIT_152A_DG_ARCHIVE_24' NAME ARCHIVE_24
+rebalance power 1;
+
+
+
 
 ALTER DISKGROUP DATA ADD DISK '/dev/oracleasm/disks/DATA006'; 
 

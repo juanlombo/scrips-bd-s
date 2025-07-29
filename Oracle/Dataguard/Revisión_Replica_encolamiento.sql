@@ -309,39 +309,75 @@ FROM
 
 /oracle/app/oracle/diag/rdbms/bctstby/bctstby/trace
 
+./50564290/50320160_BCT_cs3m6mdk_1_1
 
 
 
+LIST BACKUP OF ARCHIVELOG SEQUENCE 581189 THREAD 2;
 
-LIST BACKUP OF ARCHIVELOG SEQUENCE 422453 THREAD 1;
-cd ../49858144
-ls 49774593_BCT_jh3kkq1k_1_1
-cd ../49871446
-ls 49774593_BCT_jh3kkq1k_1_1
-cd ../49872512
-ls 49774593_BCT_jh3kkq1k_1_1
-cd ../49864722
-ls 49774593_BCT_jh3kkq1k_1_1
-cd ../49859044
-ls 49774593_BCT_jh3kkq1k_1_1
-cd ../49873102
-ls 49774593_BCT_jh3kkq1k_1_1
-cd ../49873510
-ls 49774593_BCT_jh3kkq1k_1_1
+
+cd ../50570209
+ls 50320160_BCT_cs3m6mdk_1_1
+cd ../50571093
+ls 50310407_BCT_c63m611q_1_1
+cd ../50564290
+ls 50310407_BCT_c63m611q_1_1
+50317157_BCT_ci3m6f36_1_1
+50318675_BCT_cm3m6ijk_1_1
+find . -type f -name "*50318675_BCT_cm3m6ijk_1_1*"
+./50564290/50314964_BCT_cf3m6bim_1_1
+./50564290/50318675_BCT_cm3m6ijk_1_1
+Se eejecuta por rman
 run
 {
-configure channel device type 'sbt_tape' PARMS="SBT_LIBRARY=/opt/commvault/Base/libobk.so,ENV=(BACKUP_DIR=/restore/49873510,CV_media=FILE)";
+configure channel device type 'sbt_tape' PARMS="SBT_LIBRARY=/opt/commvault/Base/libobk.so,ENV=(BACKUP_DIR=/restore/50564290,CV_media=FILE)";
 catalog device type 'sbt_tape' backuppiece
-'49752871_BCT_gi3kj1pe_1_1';
+'50314964_BCT_cf3m6bim_1_1',
+'50318675_BCT_cm3m6ijk_1_1';
 }
-RESTORE ARCHIVELOG SEQUENCE 420143 THREAD 1;
-RESTORE ARCHIVELOG FROM SEQUENCE 420117 UNTIL SEQUENCE 420167 THREAD 1;
+
+se eejcuta por rman
+RESTORE ARCHIVELOG SEQUENCE 581210 THREAD 2;
+RESTORE ARCHIVELOG FROM SEQUENCE 423423 UNTIL SEQUENCE 423448 THREAD 1;
+-- HILO 2
+RESTORE ARCHIVELOG FROM SEQUENCE 581448 UNTIL SEQUENCE 581468 THREAD 2;
+-- HILO 3
+RESTORE ARCHIVELOG FROM SEQUENCE 321821 UNTIL SEQUENCE 321839 THREAD 3;
 select PROCESS,STATUS,THREAD#,SEQUENCE# from GV$MANAGED_STANDBY where PROCESS = 'MRP0';
 
 
+
++====================================================+
+|   SABER LA FECHA EN LA QUE VA LA RESTAURACIÓN
++====================================================+
+SELECT sequence#, thread#, first_time, next_time
+FROM v$archived_log
+WHERE sequence# = 422941 AND thread# = 1;
 
 
 /u02/app/oracle/diag/rdbms/csoadg/CSOA1/trace
 
 
 /u02/app/oracle/diag/rdbms/csoadg/CSOA2/trace
+
+-------------------------------------------
+fecha de generacion archivelog
+-------------------------------------------
+ 
+set lines 200
+col name for a30
+alter session set nls_date_format='yyyy-mm-dd hh24:mi:ss';
+select name,first_time,completion_time from v$archived_log where sequence# between '423136' and '423136' order by stamp desc;
+
+-------------------------------------------
+fecha de backup piece
+-------------------------------------------
+ 
+ 
+rman target /
+list backuppiece '50313409_BCT_cc3m682g_1_1';
+ 
+set lines 200
+alter session set nls_date_format='yyyy-mm-dd hh24:mi:ss';
+select sequence#, FIRST_TIME from v$backup_archivelog_details where btype_key=331132;
+

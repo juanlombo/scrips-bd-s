@@ -21,6 +21,28 @@ and username is not null
 order by last_call_et asc, 1,2   
 /
 
+-- CONSULTA 2
+
+col inst_id format 999 
+col username format a15 
+col sid format 999999 
+col serial# format 999999999 
+col Minutos format 999999999 
+col WAIT_CLASS format a13 
+col event format a40 
+col machine format a30 
+col osuser format a20 
+set lines 500 
+set pages 100 
+select inst_id, username,OSUSER, sid, serial#, status, round(last_call_et/60) Min, WAIT_CLASS, event, machine,sql_id 
+from gv$session 
+where STATUS='ACTIVE' 
+and username not in('SYS','SYSTEM') 
+order by last_call_et desc, 1,2 
+/ 
+select username Usuario_Oracle, count (username) Numero_Sesiones from gv$session where STATUS = 'ACTIVE' group by username order by Numero_Sesiones desc;
+
+
 +======================================+
 |  CONSULTAR SESIONES Y USUARIOS SYS   |
 +======================================+
@@ -111,7 +133,7 @@ ORDER BY last_call_et DESC, inst_id, username;
 set linesize 1500
 col sql_id for 9999999
 col sql_text for a100
-select sql_id, sql_text from v_$sql where sql_id in ('dkg0pfhhy25v8');
+select sql_id, sql_text from v_$sql where sql_id in ('4qr0mp15rgwcf');
 
 +======================================+
 |     REVISAR QUE EJECUTA EL SID       |
@@ -142,7 +164,7 @@ FROM v$session s
     ,v$process p
     ,v$sql     q
 WHERE s.paddr          = p.addr
-AND   s.sid           = '2564'
+AND   s.sid           = '1713'
 AND   s.sql_address    = q.address(+)
 AND   s.sql_hash_value = q.hash_value(+);
 
@@ -166,7 +188,7 @@ FROM v$session s
     ,v$process p
     ,v$sql     q
 WHERE s.paddr          = p.addr
-AND   p.spid           = '5254'
+AND   p.spid           = '8635'
 AND   s.sql_address    = q.address(+)
 AND   s.sql_hash_value = q.hash_value(+);
 +======================================+
@@ -339,3 +361,11 @@ SET LINES 400 PAGES 800
 SELECT A.INSTANCE_NAME, A.VERSION, A.STARTUP_TIME, A.STATUS, B.OPEN_MODE, A.host_name, B.DATABASE_ROLE FROM GV$INSTANCE 
 A JOIN GV$DATABASE B ON A.INST_ID = B.INST_ID ORDER BY INSTANCE_NAME;
 
+ // REVISAR AVANCE DEL PROCESO_PROTECCION
+ SELECT node_id,physical_operator_name, SUM(row_count) row_count, 
+   SUM(estimate_row_count) AS estimate_row_count, 
+   CAST(SUM(row_count)*100 AS float)/SUM(estimate_row_count)  
+FROM sys.dm_exec_query_profiles   
+WHERE session_id=113
+GROUP BY node_id,physical_operator_name  
+ORDER BY node_id;

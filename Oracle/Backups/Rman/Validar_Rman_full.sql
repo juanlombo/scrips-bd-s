@@ -95,3 +95,11 @@ order by recid ;
 +====================================================================+
 SELECT directory_name, directory_path FROM dba_directories WHERE directory_name = 'DISK_BACKUP_CTRLFILE';
 
++====================================================================+
+|              PROGRESO DETALLADO DEL BACKUP                         |
++====================================================================+
+SELECT SID, SERIAL#, CONTEXT, SOFAR, TOTALWORK,
+       ROUND(SOFAR/TOTALWORK*100,2) "%_COMPLETE", 
+       TIME_REMAINING, OPNAME, TARGET 
+FROM V$SESSION_LONGOPS 
+WHERE OPNAME LIKE 'RMAN%' AND TOTALWORK != 0 AND SOFAR != TOTALWORK;

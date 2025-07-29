@@ -5,7 +5,7 @@ SELECT USERNAME,ACCOUNT_STATUS,LOCK_DATE,EXPIRY_DATE FROM DBA_USERS WHERE USERNA
 ----CAMBIAR A OPEN
 ALTER USER dbsnmp account unlock;
 -----CAMBIAR CONTRASEÑA
-ALTER USER dbsnmp IDENTIFIED BY "DmjY7UFH_CnusBE6Z*fAH" ACCOUNT UNLOCK;
+ALTER USER PRUCONEXION IDENTIFIED BY "zeti01" ACCOUNT UNLOCK;
 
 
 ALTER USER SQL_JDALVAREZ ACCOUNT LOCK;
@@ -15,7 +15,7 @@ ALTER USER SQL_JDALVAREZ ACCOUNT LOCK;
 |                   PRUEBA DE CONEXION                                   |
 +========================================================================+
 sqlplus /nolog
-@> CONNECT dbsnmp/DmjY7UFH_CnusBE6Z*fAH
+@> CONNECT PRUCONEXION/zeti01@GSPSPEC
        /*con pdb*/
 @> CONNECT DBSNMP/DmjY7UFH_CnusBE6Z*fAH@PDB
 
@@ -38,7 +38,7 @@ ALTER USER SQ_JSUAREZ_SOFKA ACCOUNT EXPIRE;
 =========================================================================+
 SELECT username, account_status,lock_date,created, profile, last_login   
 FROM DBA_USERS                                                           
-WHERE USERNAME = 'dbsnmp';    
+WHERE USERNAME = 'PRUCONEXION';    
                                     
 +========================================================================+ 
         CONSULTAR PRIVILEGIOS QUE TIENE UN ESQUEMA EN LAS TABLAS         |
@@ -55,7 +55,7 @@ SELECT
 FROM 
     dba_users
 WHERE 
-    username = 'dbsnmp';
+    username = 'pruconexion';
 
 
 +=================================================================================+
