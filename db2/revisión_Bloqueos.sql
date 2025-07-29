@@ -12,7 +12,7 @@ db2inst1 = productiva
 
 db2top  ---tecla U para ingresar a la lista de bloqueo
 Si hay bloqueo --L  mirar la cabecera del bloqueo
-
+a--- para mirar el SID boqueante 
 +=======================================+
 |tomamos el id de la cabeza del bloqueo |
 +=======================================+
@@ -20,7 +20,7 @@ db2top--a
 /* pegamos el id*/
 /* vemos la sentencia que ejecuta la sesión */
 /* y si tenemos autorización finalizamos la sesión */
-db2 "force application (56095)" 
+db2 "force application (56915)" 
 
 
 +=======================================+

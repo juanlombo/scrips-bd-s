@@ -25,7 +25,8 @@ group by tablespace_name) tot,
 dba_tablespaces tbs  
 where tot.tablespace_name = tbs.tablespace_name  
 and fre.tablespace_name(+) = tbs.tablespace_name  
-and tbs.TABLESPACE_NAME  Like ('%%PSINDEX%')  
+--and tbs.TABLESPACE_NAME  Like ('%%PSINDEX%')  
+and tbs.TABLESPACE_NAME  = ('ANA_INDEX')
 group by tbs.tablespace_name, tot.bytes/1024, tot.bytes  
 order by "% Usado" desc;
 
@@ -59,6 +60,9 @@ and fre.tablespace_name(+) = tbs.tablespace_name
 and tbs.TABLESPACE_NAME  Like ('&1') 
 group by tbs.tablespace_name, tot.bytes/1024, tot.bytes 
 order by "% Usado" desc;
+
+datos
+
 
 +==================================================================================================+
 |                   LISTAR TODOS LOS TABLESPACE                                                    |
@@ -125,6 +129,73 @@ AND    d.contents like 'TEMPORARY'
 order by 8
 /
 
+##################################################################################################
+#                                 VALIDAR TB UNDO                                                #
+##################################################################################################
+SET LINESIZE 200
+SET PAGESIZE 100
+COLUMN tablespace_name FORMAT A20
+COLUMN file_name FORMAT A60
+COLUMN status FORMAT A10
+
+SELECT
+    d.tablespace_name,
+    d.status,
+    d.contents,
+    d.segment_space_management,
+    d.extent_management,
+    d.retention,
+    ROUND(SUM(f.bytes)/1024/1024, 2) AS total_mb,
+    ROUND((SUM(f.bytes) - SUM(NVL(fs.bytes, 0)))/1024/1024, 2) AS used_mb,
+    ROUND(SUM(NVL(fs.bytes, 0))/1024/1024, 2) AS free_mb,
+    ROUND(((SUM(f.bytes) - SUM(NVL(fs.bytes, 0))) / SUM(f.bytes)) * 100, 2) AS used_pct
+FROM
+    dba_tablespaces d
+JOIN
+    dba_data_files f ON d.tablespace_name = f.tablespace_name
+LEFT JOIN
+    (SELECT tablespace_name, SUM(bytes) AS bytes
+     FROM dba_free_space
+     GROUP BY tablespace_name) fs
+    ON d.tablespace_name = fs.tablespace_name
+WHERE
+    d.contents = 'UNDO'
+GROUP BY
+    d.tablespace_name,
+    d.status,
+    d.contents,
+    d.segment_space_management,
+    d.extent_management,
+    d.retention;
+
+
+
+-- Detalle de archivos de datos del tablespace UNDO
+SELECT 
+    tablespace_name,
+    file_id,
+    file_name,
+    ROUND(bytes/1024/1024,2) AS size_mb,
+    autoextensible,
+    maxbytes/1024/1024 AS max_size_mb
+FROM 
+    dba_data_files
+WHERE 
+    tablespace_name IN (SELECT tablespace_name FROM dba_tablespaces WHERE contents = 'UNDO');
+
+-- Retención de UNDO
+SHOW PARAMETER undo_retention;
+
+-- Tablespace UNDO actual
+SHOW PARAMETER undo_tablespace;
+
+
+
+
+
+
+
+
 +==================================================================================================+
 |                       validar tb temporal                                                        |
 +==================================================================================================+
@@ -132,3 +203,13 @@ set line 500
 set timing off
 col file_name for a80
 select file_id,file_name,bytes/1024/1024 PESO_MEGAS,autoextensible from dba_temp_files where tablespace_name = upper('&tablespace') order by 3 desc;
+
+
+--cierras la pdb
+ALTER PLUGGABLE DATABASE ZFERFCAR close immediate;
+--la abres
+ALTER PLUGGABLE DATABASE ZFERFCAR  open;
+--haces lo que vas a hacer y la vuelves a cerrar:
+ALTER PLUGGABLE DATABASE ZFERFCAR close immediate;
+--por último la vuelves a dejar en read only
+ALTER PLUGGABLE DATABASE ZFERFCAR  open read only;

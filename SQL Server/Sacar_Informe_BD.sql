@@ -86,3 +86,21 @@ ORDER BY
     SERVERPROPERTY('MachineName') AS NombreMaquina,
     SERVERPROPERTY('InstanceName') AS Instancia,
     SERVERPROPERTY('ServerName') AS NombreServidorCompleto;
+
+
+
+SELECT  
+    qs.execution_count,
+    qs.total_elapsed_time / 1000 AS total_elapsed_ms,
+    qs.total_elapsed_time / qs.execution_count / 1000 AS avg_elapsed_ms,
+    qs.last_execution_time,
+    st.text AS query_text
+FROM 
+    sys.dm_exec_query_stats qs
+CROSS APPLY 
+    sys.dm_exec_sql_text(qs.sql_handle) st
+WHERE 
+    st.text LIKE '%%' 
+    AND qs.last_execution_time >= DATEADD(DAY, -10, GETDATE())
+ORDER BY 
+    qs.last_execution_time DESC;

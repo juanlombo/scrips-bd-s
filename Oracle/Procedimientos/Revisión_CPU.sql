@@ -21,7 +21,7 @@ FROM v$session s
     ,v$process p
     ,v$sql     q
 WHERE s.paddr          = p.addr
-AND   p.spid           = '10331'
+AND   p.spid           = '3782'
 AND   s.sql_address    = q.address(+)
 AND   s.sql_hash_value = q.hash_value(+);
 
@@ -265,7 +265,10 @@ A JOIN GV$DATABASE B ON A.INST_ID = B.INST_ID ORDER BY INSTANCE_NAME;
 +==============================================+
 echo -n "Promedio de CPU en el servidor: " && vmstat 1 10 | tail -10 | awk '{print $13+$14}' | awk '{ sum += $1 } END { if (NR > 0) print sum / NR }' && echo " %"
 
+echo -n "Promedio de CPU en el servidor: " && vmstat 1 10 | tail -10 | awk '{print $13+$14}' | awk '{ sum += $1 } END { if (NR > 0) print sum / NR }' && echo " %"
 
+
+lscpu
 
 
 

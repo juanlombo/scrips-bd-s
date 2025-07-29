@@ -1,0 +1,36 @@
+alter session set container=PDBBCT;
+DECLARE
+  l_sql_tune_task_id  VARCHAR2(100);
+BEGIN
+  l_sql_tune_task_id := DBMS_SQLTUNE.create_tuning_task (
+                          sql_id      => 'grdtkg36c49nt',
+                          scope       => DBMS_SQLTUNE.scope_comprehensive,
+                          time_limit  => 30000,
+                          task_name   => 'grdtkg36c49nt_mejoras',
+                          description => 'tuning_grdtkg36c49nt');
+  DBMS_OUTPUT.put_line('l_sql_tune_task_id: ' || l_sql_tune_task_id);
+END;
+/
+
+2. Execute Tuning task
+
+EXEC DBMS_SQLTUNE.execute_tuning_task(task_name => 'grdtkg36c49nt_mejoras');
+
+3. Get the Tuning task
+
+set long 65536
+set longchunksize 65536
+set linesize 100
+select dbms_sqltune.report_tuning_task('grdtkg36c49nt_mejoras') from dual;
+
+4. Get list of tuning task present in database:
+
+SELECT TASK_NAME, STATUS FROM DBA_ADVISOR_LOG WHERE TASK_NAME='grdtkg36c49nt_mejoras' ;
+
+5. Drop a tuning task
+
+execute dbms_sqltune.drop_tuning_task('grdtkg36c49nt_mejoras');
+
+exit;
+
+

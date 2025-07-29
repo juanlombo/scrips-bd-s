@@ -67,6 +67,15 @@ SELECT create_date FROM sys.databases WHERE name =  'tempdb';
 Select sqlserver_start_time from sys.dm_os_sys_info;
 
 +===============================================================+
+|              Revisar peso de BD                               |
++===============================================================+
+USE dwdata;
+EXEC sp_spaceused;
+
+/u01/app/oracle/product/19.0.0.0/dbhome_1/rdbms/audit
+
+
++===============================================================+
 |           REVISIÓN EJECUCIÓN DE BACKUP Y DESTINO              |
 +===============================================================+
 SELECT 
@@ -95,6 +104,19 @@ WHERE
 ORDER BY  
     bs.database_name, 
     bs.backup_finish_date;
+
+
+-----SABER EL ORGIEN 
+
+
+	SELECT TOP 20
+    bs.database_name,
+    bs.backup_start_date,
+    bs.backup_finish_date,
+    bs.user_name
+FROM msdb.dbo.backupset bs
+ORDER BY bs.backup_finish_date DESC;
+
 
 +===============================================================+
 |           modelo de recuperación de la BD                     |
@@ -129,6 +151,8 @@ ORDER BY backup_start_date DESC;
 -- F: Backup de archivos
 -- G: Backup diferencial de archivos
 
+SELECT *
+  FROM [master].[dbo].[SETI_DBA_CURRENTLYEXEC]
 
 +===============================================================+
 |    Validar que no este ningun procesos en ejecucicón          |
@@ -138,3 +162,48 @@ declare @cmd varchar(500)
 set @cmd='USE ? dbcc opentran()'   
 EXECUTE sp_msforeachdb @cmd
 
+
+
+select size/128 Tamaño,fileproperty(name,'spaceused')/128 Ocupado,name Nombre, type_desc Tipo, physical_name Ruta_Fisica, state_desc Estado 
+from sys.database_files
+
+SELECT 
+    size / 128 AS Tamaño,
+    FILEPROPERTY(name, 'SpaceUsed') / 128 AS Ocupado,
+    name AS Nombre,
+    type_desc AS Tipo,
+    physical_name AS Ruta_Fisica,
+    state_desc AS Estado
+FROM 
+    sys.database_files
+WHERE 
+    name = 'FactExcesosGestion_FG202506';
+
+
+BIProteccionDW BIProteccionDW_V1_logPrimario 83.37%
+
+
+DBCC SQLPERF(LOGSPACE);
+
+SELECT 
+    name AS FileName,
+    size * 8 / 1024 AS SizeMB,
+    growth,
+    is_percent_growth,
+    max_size
+FROM sys.master_files
+WHERE database_id = DB_ID('TuBaseDeDatos');
+
+
+########################################
+#              ELIMNAR BD              #
+########################################
+
+USE master;
+GO
+
+ALTER DATABASE ExtensaCardio_20250708 SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+GO
+
+DROP DATABASE ExtensaCardio_20250708;
+GO

@@ -34,3 +34,17 @@ FROM sys.dm_exec_sessions s
 LEFT JOIN sys.dm_exec_requests r ON s.session_id = r.session_id
 CROSS APPLY sys.dm_exec_sql_text(r.sql_handle) t
 WHERE s.session_id = 80
+
+
+
+
+
+ *************************************************REVISAR PROCESO 
+ // REVISAR AVANCE DEL PROCESO_PROTECCION
+ SELECT node_id,physical_operator_name, SUM(row_count) row_count, 
+   SUM(estimate_row_count) AS estimate_row_count, 
+   CAST(SUM(row_count)*100 AS float)/SUM(estimate_row_count)  
+FROM sys.dm_exec_query_profiles   
+WHERE session_id=113
+GROUP BY node_id,physical_operator_name  
+ORDER BY node_id;

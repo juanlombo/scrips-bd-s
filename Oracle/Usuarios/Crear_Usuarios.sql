@@ -1,12 +1,13 @@
 +========================================================================+ 
 |                  CONSULTAR USUARIO                                     |
 +========================================================================+ 
-SELECT USERNAME,ACCOUNT_STATUS,LOCK_DATE,EXPIRY_DATE FROM DBA_USERS WHERE USERNAME = 'SQL_JDALVAREZ';
+SELECT USERNAME,ACCOUNT_STATUS,LOCK_DATE,EXPIRY_DATE FROM DBA_USERS WHERE USERNAME LIKE '%JUANLOMBO%';
 ----CAMBIAR A OPEN
-ALTER USER dbsnmp account unlock;
+ALTER USER METRO account unlock;
 -----CAMBIAR CONTRASEÑA
-ALTER USER PRUCONEXION IDENTIFIED BY "zeti01" ACCOUNT UNLOCK;
+ALTER USER ORDS_PUBLIC_USER IDENTIFIED BY "oRds_Public2025**" ACCOUNT UNLOCK;
 
+YXMWHC9b2
 
 ALTER USER SQL_JDALVAREZ ACCOUNT LOCK;
 
@@ -15,7 +16,9 @@ ALTER USER SQL_JDALVAREZ ACCOUNT LOCK;
 |                   PRUEBA DE CONEXION                                   |
 +========================================================================+
 sqlplus /nolog
-@> CONNECT PRUCONEXION/zeti01@GSPSPEC
+@> CONNECT ADM1006352007/C0l0mB1a_2025%
+
+
        /*con pdb*/
 @> CONNECT DBSNMP/DmjY7UFH_CnusBE6Z*fAH@PDB
 
@@ -27,6 +30,8 @@ ALTER USER SQ_JSUAREZ_SOFKA PASSWORD EXPIRE;
 |                  Bloquear la cuenta (Inactivar)                        |
 +========================================================================+
 ALTER USER PROCESOS ACCOUNT UNLOCK;
+ALTER USER ADM1214719234 ACCOUNT LOCK;
+ALTER USER ADM1214719234 PASSWORD EXPIRE;
 +========================================================================+ 
 |   Configurar fecha de expiración (Para inactivar en el futuro)         |
 +========================================================================+
@@ -74,6 +79,10 @@ PASSWORD EXPIRE;
 +=================================================================================+
 
 GRANT SELECT ON ESB_SAP.LISTA_PRECIOS TO jhonatan_leiva;
+
+--le otorga al usuario permiso de solo lectura (SELECT) sobre cualquier tabla de cualquier esquema en la base de datos, con algunas excepciones.
+GRANT SELECT ANY TABLE TO "1032446598";
+
 
 +=================================================================================+
 |                  CAMBIAR DE PROFILE O ASIGNAR PROFILE                           |
@@ -124,6 +133,113 @@ SELECT USERNAME, PROFILE FROM DBA_USERS WHERE USERNAME IN ('JHONATAN_LEIVA','ANG
 
 sqlplus /nolog
 @> CONNECT ANGELA_ROSERO/ANG$ros3ro#2025@PDBBCT
+
+
++=======================================================================================
+|                 REPISAR CONTRASEÑA EXISTENTE 
++======================================================================================
+
+set lines 300
+select 'alter user ' || name || ' identified by values ''' || spare4 || ''';' password from sys.user$ where name like 'METRO';
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+---===========================================================================+
+---          ASIGANACIÓN DE PERMISOS SELECT Y EJECUCIÓN A USUARIO EN TABLAS   |
+---===========================================================================+
+
+/*REVISAR QUE EL USUARIO EXISTA*/
+
+SELECT USERNAME,ACCOUNT_STATUS,LOCK_DATE,EXPIRY_DATE FROM DBA_USERS WHERE USERNAME = 'SQL_AURREA';
+
+
+/*REVISAR QUE LAS TABLAS A LAS QUE SE NECESITAN LOS PERMISOS EXISTAN*/
+
+SELECT owner, object_name, object_type
+FROM all_objects
+WHERE owner = 'METRO'
+AND object_name IN ('LOG_MRAWEB', 'RECIBOS_TRANSP');
+
+
+/*REVISAR QUE LA FUNCIÓN A LA QUE SE LE ENECITA DAR PERMISOS DE EJECUCIÓN EXITA*/
+
+SELECT owner, object_name, object_type
+FROM all_objects
+WHERE owner = 'METRO'
+AND object_name = 'FN_SOBRANTES_CONCILIACION';
+
+---==========================+
+---       OTORGAR PERMISOS   |
+---==========================+
+
+/*Permite al usuario ver (consultar) la tabla METRO.LOG_MRAWEB*/
+
+GRANT SELECT ON metro.log_mraweb TO SQL_AURREA;
+GRANT SELECT ON metro.recibos_transp TO SQL_AURREA;
+
+
+/*Permite al usuario ejecutar (usar) la función METRO.FN_SOBRANTES_CONCILIACION*/
+
+GRANT EXECUTE ON metro.fn_sobrantes_conciliacion TO SQL_AURREA;
+
+
+---========================================+
+---     VALIDAR QUE SE OTORGARON PERMISOS  |
+---========================================+
+SELECT grantee, privilege, owner, table_name
+FROM dba_tab_privs
+WHERE grantee = 'SQL_AURREA'
+AND owner = 'METRO';
+
+SELECT grantee, privilege, owner, name
+FROM dba_tab_privs
+WHERE grantee = 'SQL_AURREA'
+AND name = 'FN_SOBRANTES_CONCILIACION';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -118,3 +118,74 @@ SELECT * FROM V$ASM_OPERATION;
 
 
 --Seguir el proceso con la consulta, al finalizar se puede validar el asm, la consulta no debe arrojar resultados y ya se puede responder
+
+
+
+---#$#$#$#
+--TAMAÑOS DISCOS DISPONIBLES (CANDIDATOS) DE UNA BD POR SERVIDOR
+set pagesize 1000
+set line 2000
+col path format a60
+col name format a25
+select inst_id, name, path, mode_status, header_status,state, disk_number, os_mb, group_number
+from gv$asm_disk
+where header_status<>'MEMBER'
+order by 2,1;
+ 
+---#$#$VER DISCOS ASM
+set lines 500
+col path format a60
+col name format a25
+col DISKGROUP_NAME for a10
+select a.group_number ,b.name diskgroup_name, a.disk_number, a.name disk_name, a.path, a.header_status, a.total_mb
+from  gv$asm_disk a, v$asm_diskgroup b
+where a.group_number=b.group_number
+order by 1,3 ;
+ 
+ 
+---$#$#DISCOS EN ASM SOBRE LA BD O EL ASM
+set linesize 1500
+col INST_ID for 99999999
+col name for a35
+col path for a60
+col mode_status for a10
+col header_status for a15
+col state for a10
+col disk_number for 99999999
+col os_mb for 99999999
+col group_number for 99999999
+select inst_id, name, path, mode_status, header_status,state, disk_number, os_mb, group_number
+from gv$asm_disk
+where HEADER_STATUS='MEMBER'
+order by 2,1;
+ 
+ 
+--#$#$VER DISCOS DISPONIBLES --- CANDIDATE --- FORMER
+set linesize 1500
+col INST_ID for 99999999
+col name for a10
+col path for a40
+col mode_status for a10
+col header_status for a20
+col state for a10
+col disk_number for 99999999
+col os_mb for 99999999
+col group_number for 99999999
+select inst_id, name, path, mode_status, header_status,state, disk_number, os_mb, group_number
+from gv$asm_disk
+where HEADER_STATUS NOT IN ('MEMBER')
+order by 2,1;
+ 
+ 
+select distinct (path), name, mode_status, header_status,state, disk_number, os_mb, group_number
+from gv$asm_disk
+where HEADER_STATUS NOT IN ('MEMBER')
+order by 2,1;
+ 
+---SABER FECHA DE AGREGACION DISCOS A LOS DISKGROUPS - GENERAL
+set pagesize 1000
+set line 2000
+col path format a40
+col name format a25
+select * from   V$ASM_DISK va join V$ASM_DISKGROUP vas on
+      va.group_number = vas.group_number;

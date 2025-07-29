@@ -54,9 +54,15 @@ BEGIN
 |    ---       DESACTIVAR LA EJECUCIÓN DEL JOB                               |
 +============================================================================+
  begin
- DBMS_SCHEDULER.disable(name=>'"BCT_NATIVA"."P_VAL_ENCOLA"', force => TRUE);
+ DBMS_SCHEDULER.disable(name=>'"SYS"."SYS_EXPORT_FULL_02"', force => TRUE);
  end;
  /
+
+
+ BEGIN
+  APEX_INSTANCE_ADMIN.SET_PARAMETER(p_parameter => 'JOB_ORACLE_APEX_DAILY_METRICS_ENABLED', p_value     => 'N');
+END;
+/
 
 +============================================================================+
 |    ---       Verificar la Ejecución y Monitorear el Job                    |
@@ -74,7 +80,7 @@ ORDER BY actual_start_date DESC;
 
 SELECT job_name, status, actual_start_date, run_duration
 FROM DBA_SCHEDULER_JOB_RUN_DETAILS
-WHERE job_name = 'JOB_PROCEDURE_MANT_BCT'
+WHERE job_name = 'ORACLE_APEX_DAILY_METRICS'
 ORDER BY actual_start_date DESC;
 
 select owner, job_name,job_type,next_run_date,STATE from dba_scheduler_jobs 
@@ -113,6 +119,30 @@ FROM dba_scheduler_job_run_details
 WHERE status = 'FAILED'
 ORDER BY log_date DESC;
 
+
+SET LINESIZE 200
+SET PAGESIZE 100
+
+SELECT 
+    j.owner,
+    j.job_name,
+    r.status,
+    r.error#,
+    r.actual_start_date,
+    r.run_duration,
+    r.instance_id,
+    r.additional_info
+FROM 
+    dba_scheduler_job_run_details r
+JOIN 
+    dba_scheduler_jobs j ON j.job_name = r.job_name AND j.owner = r.owner
+WHERE 
+    r.status = 'FAILED'
+    AND r.actual_start_date > SYSDATE - 3 -- últimos 24 horas
+ORDER BY 
+    r.actual_start_date DESC;
+
+
 -- ========================================================
 --                REVISAR ERROR DEL JOB 
 -- ========================================================
@@ -130,11 +160,22 @@ AND STATUS = 'FAILED'
 ORDER BY LOG_DATE DESC;
 
 -- ========================================================
+--                REVISAR campo
+-- ========================================================
+
+SELECT column_name, data_length 
+FROM all_tab_columns 
+WHERE owner = 'APEX_240200'
+  AND table_name = 'WWV_INSTANCE_AGGR_METRICS'
+  AND column_name = 'CURRENT_DB_VERSION';
+
+
+-- ========================================================
 --                CODIGO ESPECIFICO DEL JOB (Puede que ejecute algun procedimeinto de almacenado)
 -- ========================================================
 SELECT JOB_ACTION 
 FROM DBA_SCHEDULER_JOBS 
-WHERE JOB_NAME = 'JOB_FE_CONCILIA';
+WHERE JOB_NAME = 'APEX_240200';
 
 
 

@@ -1,5 +1,5 @@
 +======================================+
-|     Consultar sesiones activas       |
+|   --Consultar sesiones activas       |
 +======================================+
 col inst_id format 999
 col username format  a15
@@ -43,8 +43,118 @@ order by last_call_et desc, 1,2
 select username Usuario_Oracle, count (username) Numero_Sesiones from gv$session where STATUS = 'ACTIVE' group by username order by Numero_Sesiones desc;
 
 
+
+SELECT RESOURCE_NAME, CURRENT_UTILIZATION, LIMIT_VALUE
+FROM V$RESOURCE_LIMIT
+WHERE RESOURCE_NAME IN ('processes', 'sessions');
+
+#################################################
+#   --REVISAR PROCESOS Y SESIONES %             #
+#################################################
+
+COL resource_name FORMAT A20
+COL current_utilization FORMAT 9999
+COL limit_value FORMAT 999
+COL limit_value FORMAT A20
+SET LINES 100
+SET PAGES 100
+SELECT
+    resource_name,
+    current_utilization,
+    limit_value,
+    ROUND(current_utilization / TO_NUMBER(limit_value) * 100, 2) AS pct_utilizado
+FROM
+    v$resource_limit
+WHERE
+    resource_name IN ('processes', 'sessions');
+
+#################################################
+#   --REVISAR PROCESOS QUE CONSUMEN MAS         #
+#################################################
+col USERNAME format a20
+col PROGRAM format a20
+col MACHINE format a20
+SELECT
+    s.username,
+    s.program,
+    s.machine,
+    COUNT(*) AS conexiones
+FROM
+    v$session s
+WHERE
+    s.username IS NOT NULL
+GROUP BY
+    s.username, s.program, s.machine
+ORDER BY
+    conexiones DESC;
+
+
+############################################################
+# --Confirmar si esas conexiones están activas o inactivas #
+############################################################
+SELECT
+    username,
+    status,
+    COUNT(*) AS cantidad
+FROM
+    v$session
+WHERE
+    username = 'IBUSPROD'
+GROUP BY
+    username, status;
+
+
+
+#########################################################
+#    -- VER TODAS LAS SESIONES CONECTADAS               #
+#########################################################    
+SELECT
+    inst_id,
+    username,
+    status,
+    COUNT(*) AS sesiones
+FROM
+    gv$session
+WHERE
+    username IS NOT NULL
+GROUP BY
+    inst_id, username, status
+ORDER BY
+    username, status;
+
+#########################################################
+#    -- cuántos procesos están abiertos por tipo        #
+#########################################################    
+SELECT
+    program,
+    COUNT(*) AS total
+FROM
+    gv$session
+WHERE
+    username IS NOT NULL
+GROUP BY
+    program
+ORDER BY
+    total DESC;
+
+#########################################################
+#    -- CUANTO TIEMPO LLEVA ESAS SESIONES ACIVAS     #
+######################################################### 
+SELECT
+    username,
+    status,
+    COUNT(*) AS sesiones,
+    ROUND(AVG(last_call_et)/60) AS promedio_min_inactivo
+FROM
+    gv$session
+WHERE
+    username = 'IBUSPROD'
+GROUP BY
+    username, status;
+
+
 +======================================+
-|  CONSULTAR SESIONES Y USUARIOS SYS   |
+|--CONSULTAR SESIONES Y USUARIOS SYS   |
 +======================================+
 col inst_id format 999
 col username format  a15
@@ -67,7 +177,7 @@ order by last_call_et asc, 1,2
 /
 
 +======================================+
-|     Consultar sesiones ZF            |
+|  -- Consultar sesiones ZF            |
 +======================================+
 col inst_id format 999    
 col username format a20    
@@ -85,13 +195,13 @@ select inst_id, service_name, username,osuser, sid, serial#, status, round(last_
 from gv$session    
 where status='ACTIVE'    
 and username is not null
---and USERNAME = 'ESB_SAP'   
+--and USERNAME = ''   
 and username <> 'SYS'    
 order by last_call_et DESC, 1,2    
 /
 
 +======================================+
-|     Consultar sesiones iNACTIVAS     |
+|  -- Consultar sesiones iNACTIVAS     |
 +======================================+
 col inst_id format 999
 col username format  a15
@@ -114,7 +224,7 @@ order by last_call_et asc, 1,2
 /
 
 +======================================+
-|        REVISAR SESIONES SYS          |
+| --    REVISAR SESIONES SYS          |
 +======================================+
 
 SELECT inst_id, username, osuser, sid, serial#, status,
@@ -128,25 +238,40 @@ ORDER BY last_call_et DESC, inst_id, username;
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 +======================================+
-|     REVISAR QUE EJECUTA EL SQL ID    |
+|  -- REVISAR QUE EJECUTA EL SQL ID    |
 +======================================+
 set linesize 1500
 col sql_id for 9999999
 col sql_text for a100
-select sql_id, sql_text from v_$sql where sql_id in ('4qr0mp15rgwcf');
+select sql_id, sql_text from v_$sql where sql_id in ('fp2ccg0m74zrs');
 
+
+SET LINESIZE 1500
+SET PAGESIZE 100
+COLUMN sql_id FORMAT A13
+COLUMN sql_text FORMAT A1000
+SELECT sql_id, sql_text
+FROM v$sql
+WHERE sql_id = '9s0z1a73tu5x8';
+
+
+SELECT a.sql_text
+FROM gv$sqltext a, 
+gv$session b 
+WHERE a.address = b.sql_address 
+AND a.hash_value = b.sql_hash_value and b.sid=4389 and b.INST_ID=1 ORDER BY a.piece;
 +======================================+
-|     REVISAR QUE EJECUTA EL SID       |
+| --  REVISAR QUE EJECUTA EL SID       |
 +======================================+
 SELECT a.sql_text 
 FROM gv$sqltext a, 
 gv$session b 
 WHERE a.address = b.sql_address 
-AND a.hash_value = b.sql_hash_value and b.sid=2564; and b.INST_ID=2
+AND a.hash_value = b.sql_hash_value and b.sid=2815 and b.INST_ID=1
 ORDER BY a.piece;
 
 +======================================+
-| REVISAR QUE EJECUTA EL SID O SPID    |
+|--REVISAR QUE EJECUTA EL SID O SPID   |
 +======================================+
 SET LINESIZE 80 HEADING OFF FEEDBACK OFF
 SELECT
@@ -164,13 +289,49 @@ FROM v$session s
     ,v$process p
     ,v$sql     q
 WHERE s.paddr          = p.addr
-AND   s.sid           = '1713'
+AND   s.sid           = '444'
 AND   s.sql_address    = q.address(+)
 AND   s.sql_hash_value = q.hash_value(+);
 
 
+
+
+-- Reemplaza :SID y :INST_ID con los valores correctos
+-- Por ejemplo: WHERE s.sid = 1935 AND s.inst_id = 1
+
+SET LONG 10000
+SET LINESIZE 200
+SET PAGESIZE 100
+COL username FOR A15
+COL machine FOR A20
+COL event FOR A30
+COL sql_text FOR A100
+COL sql_id FOR A15
+
+SELECT 
+    s.inst_id,
+    s.sid,
+    s.serial#,
+    s.username,
+    s.machine,
+    s.status,
+    s.sql_id,
+    s.event,
+    s.wait_class,
+    ROUND(s.last_call_et / 60) AS minutes_running,
+    q.sql_text
+FROM gv$session s
+JOIN gv$sql q
+  ON s.sql_id = q.sql_id AND s.inst_id = q.inst_id
+WHERE s.username IS NOT NULL
+  AND s.sid = 275
+  AND s.inst_id = 2
+  AND s.sql_id IS NOT NULL;
+
+
+
 +======================================+
-| REVISAR QUE EJECUTA EL SID           |
+|--    REVISAR QUE EJECUTA EL SID      |
 +======================================+
 SET LINESIZE 80 HEADING OFF FEEDBACK OFF
 SELECT
@@ -188,11 +349,11 @@ FROM v$session s
     ,v$process p
     ,v$sql     q
 WHERE s.paddr          = p.addr
-AND   p.spid           = '8635'
+AND   p.spid           = '46042'
 AND   s.sql_address    = q.address(+)
 AND   s.sql_hash_value = q.hash_value(+);
 +======================================+
-|         REVISAR BLOQUEOS             |
+|     --  REVISAR BLOQUEOS             |
 +======================================+
 set line 700 pages 0 feed off 
 set serveroutput on size 20000 
@@ -361,7 +522,20 @@ SET LINES 400 PAGES 800
 SELECT A.INSTANCE_NAME, A.VERSION, A.STARTUP_TIME, A.STATUS, B.OPEN_MODE, A.host_name, B.DATABASE_ROLE FROM GV$INSTANCE 
 A JOIN GV$DATABASE B ON A.INST_ID = B.INST_ID ORDER BY INSTANCE_NAME;
 
- // REVISAR AVANCE DEL PROCESO_PROTECCION
+---SCRIP 2
+
+set echo off lines 300 pages 700
+		column STARTUP_TIME format a20
+		column HOST_NAME format a40
+		SELECT TO_CHAR(A.STARTUP_TIME,'YYYY-MM-DD HH24:MI') STARTUP_TIME,
+		SUBSTR(A.INSTANCE_NAME,1,12) INSTANCE, SUBSTR(B.OPEN_MODE,1,12) OPEN_MODE,
+		SUBSTR(B.DATABASE_ROLE,1,16) DB_ROLE, SUBSTR(A.VERSION,1,12) VERSION,
+		A.HOST_NAME FROM GV$INSTANCE A, V$DATABASE B ;
+
+
+###########################################
+--  REVISAR AVANCE DEL PROCESO_PROTECCION #
+###########################################
  SELECT node_id,physical_operator_name, SUM(row_count) row_count, 
    SUM(estimate_row_count) AS estimate_row_count, 
    CAST(SUM(row_count)*100 AS float)/SUM(estimate_row_count)  
@@ -369,3 +543,12 @@ FROM sys.dm_exec_query_profiles
 WHERE session_id=113
 GROUP BY node_id,physical_operator_name  
 ORDER BY node_id;
+
+
+show parameter pga
+
+
+SELECT name, value/1024/1024 AS value_mb
+FROM v$pgastat
+WHERE name IN ('aggregate PGA target parameter', 'total PGA allocated', 'maximum PGA allocated');
+ 

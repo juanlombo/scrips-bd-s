@@ -1,0 +1,124 @@
+cd /home/oracle/scripts
+vi tuning_advisor_fmtm9tgtrzjra.sql
+
+alter session set container=PDBBCT;
+DECLARE
+  l_sql_tune_task_id  VARCHAR2(100);
+BEGIN
+  l_sql_tune_task_id := DBMS_SQLTUNE.create_tuning_task (
+                          sql_id      => 'fmtm9tgtrzjra',
+                          scope       => DBMS_SQLTUNE.scope_comprehensive,
+                          time_limit  => 30000,
+                          task_name   => 'fmtm9tgtrzjra_mejoras',
+                          description => 'tuning_fmtm9tgtrzjra');
+  DBMS_OUTPUT.put_line('l_sql_tune_task_id: ' || l_sql_tune_task_id);
+END;
+/
+
+EXEC DBMS_SQLTUNE.execute_tuning_task(task_name => 'fmtm9tgtrzjra_mejoras');
+
+set long 65536
+set longchunksize 65536
+set linesize 100
+select dbms_sqltune.report_tuning_task('fmtm9tgtrzjra_mejoras') from dual;
+
+SELECT TASK_NAME, STATUS FROM DBA_ADVISOR_LOG WHERE TASK_NAME='fmtm9tgtrzjra_mejoras' ;
+
+--- execute dbms_sqltune.drop_tuning_task('fmtm9tgtrzjra_mejoras');
+
+exit;
+
+vi tuning_advisor_fmtm9tgtrzjra.sh
+
+export ORACLE_SID=bct3
+export ORACLE_HOME=/oracle/app/oracle/product/18.0.0/dbhome_1
+
+PATH=$ORACLE_HOME/bin:$PATH
+export PATH
+LD_LIBRARY_PATH=$ORACLE_HOME/lib
+export LD_LIBRARY_PATH
+export RUTA=/home/oracle/scripts
+
+> $RUTA/tuning_advisor.txt
+
+sqlplus -s / as sysdba @$RUTA/tuning_advisor_snap.sql >> $RUTA/tuning_fmtm9tgtrzjra_advisor.txt
+
+
+
+vi tuning_advisor.sh
+export ORACLE_PDB_SID=WMS_TOCANCIPA
+export ORACLE_HOME=/u01/app/oracle/product/19.0.0.0/dbhome_1
+
+
+PATH=$ORACLE_HOME/bin:$PATH
+export PATH
+LD_LIBRARY_PATH=$ORACLE_HOME/lib
+export LD_LIBRARY_PATH
+export RUTA=/home/oracle/scripts
+
+> $RUTA/tuning_advisor.txt
+
+sqlplus -s / as sysdba @$RUTA/tuning_advisor_snap.sql >> $RUTA/tuning_advisor.txt
+
+
+
+########################
+#   VALIDAR SNAPSHOT   #
+########################
+
+SELECT SNAP_ID FROM DBA_HIST_SQLSTAT
+WHERE SQL_ID= '9rcbm2xg7t1rb'
+ORDER BY SNAP_ID;
+
+vi tuning_advisor_snap.sql
+
+---alter session set container=PDBBCT;
+declare
+ l_sql_tune_task_id varchar2(100);
+begin
+ l_sql_tune_task_id := dbms_sqltune.create_tuning_task (
+  begin_snap => 24168,
+  end_snap => 24170,
+  sql_id => '9rcbm2xg7t1rb',
+  scope => dbms_sqltune.scope_comprehensive,
+  time_limit => 10800,
+  task_name => '9rcbm2xg7t1rb_mejoras',
+  description => 'tuning_083nrh36c3354');
+ dbms_output.put_line('l_sql_tune_task_id: ' || l_sql_tune_task_id);
+end;
+/
+
+EXEC DBMS_SQLTUNE.execute_tuning_task(task_name => '083nrh36c3354_mejoras');
+
+set long 65536
+set longchunksize 65536
+set linesize 200
+set pages 200
+select dbms_sqltune.report_tuning_task('083nrh36c3354_mejoras') from dual;
+
+SELECT TASK_NAME, STATUS FROM DBA_ADVISOR_LOG WHERE TASK_NAME='083nrh36c3354_mejoras' ;
+
+--execute dbms_sqltune.drop_tuning_task('083nrh36c3354_mejoras');
+
+exit;
+
+
+cd /home/oracle/scripts
+chmod 755 tuning_advisor.sh
+rm -f tuning.out 
+rm -f tuning_advisor.txt
+nohup sh tuning_advisor.sh > tuning.out 2>&1 &
+
+   SNAP_ID
+----------
+     53884
+     53885
+     53886
+     53886
+     53887
+     53887
+     53888
+     53888
+     53889
+     53890
+     53890

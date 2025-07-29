@@ -1,0 +1,42 @@
+
+#Nombre del servidor 
+#hostname
+        echo %COMPUTERNAME%
+
+#Fecha y hora actual:
+        echo %date% %time%
+
+#Ejemplo combinado (una sola línea):
+        echo Server: %COMPUTERNAME% - Date: %date% %time%
+
+
+#Símbolo del sistema (CMD) (Esto muestra los últimos 10 eventos relacionados con apagados o reinicios.)
+
+        wevtutil qe System /q:"*[System[(EventID=6006 or EventID=6005 or EventID=6008 or EventID=1074)]]" /f:text /c:10
+
+
++======================================================================+
+|			 PRITECCION CAMBIAN DE RUTA NTAZURE62          |
++======================================================================+
+
+Cambiar esto: Q:\
+Por esto: \\fileserveraws02.proteccion.com.co\fileserver-proteccion2\COMUN
+
+\\fileserveraws02.proteccion.com.co\fileserver-proteccion2\\ntazure62\GERENCIA PROCESOS Y TECNOLOGIA\INFO COMUN ENTRE DPTOS\COMITE DE CAMBIOS\Solicitudes\BI\
+
+\\fileserveraws02.proteccion.com.co\fileserver-proteccion2\COMUN\GERENCIA PROCESOS Y TECNOLOGIA\INFO COMUN ENTRE DPTOS\COMITE DE CAMBIOS\Solicitudes\BI\2025 - Reforma - 0_antes_dia_cero - PRD - PQ1
+
+
+
+Q:\GERENCIA PROCESOS Y TECNOLOGIA\INFO COMUN ENTRE DPTOS\COMITE DE CAMBIOS\Solicitudes\BI\2025 - Depuracion modelo rentabilidad - PROD 
+
+Q:\GERENCIA PROCESOS Y TECNOLOGIA\INFO COMUN ENTRE DPTOS\COMITE DE CAMBIOS\Solicitudes\BI\2025 - Salesforce - PRD - PQ5 - SP170
+ 
+
+ Q:\GERENCIA PROCESOS Y TECNOLOGIA\INFO COMUN ENTRE DPTOS\COMITE DE CAMBIOS\Solicitudes\BI\2025 - Salesforce - PRD - PQ5 - SP170
+ 
+ \\fileserveraws02.proteccion.com.co\fileserver-proteccion2\COMUN\
+\\fileserveraws02.proteccion.com.co\fileserver-proteccion2\COMUN\GERENCIA PROCESOS Y TECNOLOGIA\INFO COMUN ENTRE DPTOS\COMITE DE CAMBIOS\Solicitudes\BI\2025 - Salesforce - PRD - PQ5 - SP170  
+\\fileserveraws02.proteccion.com.co\fileserver-proteccion2\COMUN\GERENCIA PROCESOS Y TECNOLOGIA\INFO COMUN ENTRE DPTOS\COMITE DE CAMBIOS\Solicitudes\Produccion\2025\Seti\Depuracion Modelo Rentabilidad
+
+Q:\GERENCIA PROCESOS Y TECNOLOGIA\INFO COMUN ENTRE DPTOS\COMITE DE CAMBIOS\Solicitudes\Produccion\2025\Seti\Depuracion Modelo Rentabilidad

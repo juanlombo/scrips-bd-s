@@ -56,3 +56,5 @@ WHERE j.job_id = 0x93B9836ED668314CB84AADD91B734EAE
 
 
 
+select * from msdb..sysmail_allitems
+order by 1 desc

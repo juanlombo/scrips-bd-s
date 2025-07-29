@@ -217,6 +217,15 @@ order by 1;
 +=======================================+
 select bytes/1024/1024 bytes from v$log;
 
+
+
+
+#################################
+#--Identificar el Rol de la BD  #
+#################################
+SELECT database_role FROM v$database;
+
+
 +=======================================+
 --------*******pasar a read only 
 +=======================================+
@@ -252,6 +261,8 @@ SELECT PROCESS, STATUS, THREAD#, SEQUENCE#, BLOCK#, BLOCKS FROM V$MANAGED_STANDB
 	------SUBIR CON ARCHIVE
 	alter database recover managed standby database disconnect from session;
 	alter database recover managed standby database disconnect parallel 4 using current logfile;
+
+	
 
 +================================================================================+
 |         --              revisión log history                                   |
@@ -297,17 +308,21 @@ JOIN v$logfile f ON l.group# = f.group#;
 SHOW PARAMETER log_archive_dest;
 
 
--- Consulta 2: Obtener información de diagnóstico
-SELECT 
-    value 
-FROM 
-    V$DIAG_INFO;
+-- Consulta 2: Obtener información de ALERT.LOG
+
+SELECT value FROM V$DIAG_INFO;
+
+SELECT value FROM V$DIAG_INFO;
 
 
 
-/oracle/app/oracle/diag/rdbms/bctstby/bctstby/trace
+# Ver el alert log de cada nodo (reemplazá ORACLE_BASE si es diferente)
+tail -1000 /u01/app/oracle/diag/rdbms/wmscdb_iad1bq/wmscdb1/trace/alert_wmscdb1.log | grep "Apr 29" 
 
-/oracle/app/oracle/diag/rdbms/bctstby/bctstby/trace
+
+
+/u01/app/oracle/diag/rdbms/wmscdb_iad1bq/wmscdb2/trace
+
 
 ./50564290/50320160_BCT_cs3m6mdk_1_1
 
@@ -370,7 +385,7 @@ alter session set nls_date_format='yyyy-mm-dd hh24:mi:ss';
 select name,first_time,completion_time from v$archived_log where sequence# between '423136' and '423136' order by stamp desc;
 
 -------------------------------------------
-fecha de backup piece
+     fecha de backup piece
 -------------------------------------------
  
  
@@ -381,3 +396,4 @@ set lines 200
 alter session set nls_date_format='yyyy-mm-dd hh24:mi:ss';
 select sequence#, FIRST_TIME from v$backup_archivelog_details where btype_key=331132;
 
+/oracle/app/oracle/diag/rdbms/bctstby/bctstby/trace

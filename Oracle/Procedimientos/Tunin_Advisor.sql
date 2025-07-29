@@ -49,13 +49,13 @@ order by snap_id desc, a.instance_number;
 |                             qUERY QUE UTILIZA                               |
 +=============================================================================+
 
-select sql_id, SQL_TEXT from dba_hist_sqltext where sql_id='5zs96qb0nuwgv';
+select sql_id, SQL_TEXT from dba_hist_sqltext where sql_id='5wnpymhnd7jah';
 
 
 +=============================================================================+
 |                            Con ese sacas el plan de ejecución               |
 +=============================================================================+
-select * from table(dbms_xplan.display_cursor('5zs96qb0nuwgv', null, 'ALLSTATS LAST'));
+select * from table(dbms_xplan.display_cursor('5wnpymhnd7jah', null, 'ALLSTATS LAST'));
 
 SELECT sql_id, plan_hash_value, substr(sql_text,1,40) sql_text
       FROM  v$sql

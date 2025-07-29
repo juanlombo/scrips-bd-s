@@ -20,6 +20,29 @@ nohup exportdb_KOBI_TIENDAS_20250320.sh &
 -- exclude=statistics
 -- tables=FRONT.KOBI_TIENDAS
 
+EXPDP
+
+-- cuanto core de cpu tiene el server
+ nproc --all
+
+vi exportdb_devbct2_20250618.par
+directory=EXPDP
+dumpfile=expdp_devbct2_KOBI_TIENDAS_20250320.dmp
+
+
+vi exportdb_devbct2_20250618.par
+DUMPFILE=expdp_devbct2_excl_%U.dmp
+DIRECTORY=EXPDP
+LOGFILE=expdp_devbct2_excl.log
+FULL=Y
+EXCLUDE=SCHEMA:"IN ('SYS','SYSTEM')"
+PARALLEL=4
+FILESIZE=100G
+
+
+vi exportdb_devbct2_20250618.sh
+export ORACLE_PDB_SID=PDBBCT
+expdp \"/ as sysdba\" parfile=exportdb_devbct2_20250618.par
  ===================================================================================
  						CREACIÓN .par PARA expdp
  ===================================================================================
@@ -48,6 +71,9 @@ nohup exportdb_KOBI_TIENDAS_20250320.sh &
 
 Dar permiosos de ejecución 
 chmod +x import_KOBI_TIENDAS_20250320.sh
+
+
+CREATE DIRECTORY EXPDP_BKP AS '/u02/export_190625';
 
 -- nohup impdp "'/ as sysdba '" directory=DIR_IMP_DMP dumpfile=expdp_full_socrates_2025.02.16.dmp.gz logfile=import_full_socrates_20250216.log SCHEMAS=GAA2 TABLE_EXISTS_ACTION=REPLACE &
 
@@ -132,3 +158,12 @@ time scp /oracle/expdp/expdp_AUDITORY_HISTORY_feb05_2025.log oracle@172.18.164.2
 -- CHc*B2aR3k$HTLAvD
 
 nohup ./exportdb.sh &
+
+-- //// VER DIRECTORIOS
+SELECT directory_name, directory_path
+FROM dba_directories
+ORDER BY directory_name;
+
+
+
+ SELECT username FROM dba_users WHERE account_status = 'OPEN';

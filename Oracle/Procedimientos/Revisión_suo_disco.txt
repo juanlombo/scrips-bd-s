@@ -1,0 +1,31 @@
+
+iostat -x 1 5 | egrep 'device|xvdaa'
+
+Campo	        Significado
+%user	        Tiempo de CPU en modo usuario (no relevante aquí, omitido).
+r/s	            Lecturas por segundo
+w/s	            Escrituras por segundo
+rMB/s          	Megabytes leídos por segundo (algunos sistemas muestran kB/s o MB/s)
+wMB/s	         Megabytes escritos por segundo
+rrqm/s	         Lecturas combinadas por segundo (request merges)
+wrqm/s	         Escrituras combinadas por segundo
+r_await	         Tiempo promedio de espera para lecturas (ms)
+w_await	         Tiempo promedio de espera para escrituras (ms)
+aqu-sz	         Longitud promedio de la cola de solicitudes de E/S
+rareq-sz	     Tamaño promedio de lectura (en sectores o KB)
+wareq-sz	     Tamaño promedio de escritura
+svctm	         Tiempo promedio de servicio por operación (ms) – OBSOLETO en versiones nuevas
+%util	         Porcentaje de utilización del dispositivo (máximo 100%)
+
+pidstat -d 1 5
+
+
+iostat -x -d xvdaa1 1 5
+
+Columna	Qué significa	¿Qué valor indica sin carga?
+r/s y w/s	 L ecturas y escrituras por seg.	     0.00 = no se está leyendo ni escribiendo
+%util	     Porcentaje de uso del disco	         0.00 = el disco no está siendo usado
+await	     Tiempo total de espera	                 0.00 = nadie espera por disco
+svctm	     Tiempo de servicio promedio	         0.00 = no hay servicio en curso
+
+grep "Jul 15 02:59" /var/log/messages

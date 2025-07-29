@@ -1,0 +1,67 @@
++==========================================+
+|      🔧 Inicializar y configuración      |
++==========================================+
+git init
+
++==========================================+
+📋 Estado y seguimiento de archivos
++==========================================+
+git status
+<!-- Muestra el estado de los archivos (nuevos, modificados, eliminados). -->
+
+<!-- Agrega un archivo al staging area (zona de preparación). -->
+git add archivo.txt
+
+<!-- Agrega todos los archivos modificados al staging. -->
+git add .
+
++==========================================+
+                📦 Commits
++==========================================+
+git commit -m "Mensaje del commit"
+<!-- Crea un snapshot del proyecto con los cambios en staging. -->
+
+<!-- Muestra el historial de commits. -->
+git log
+
++==========================================+
+    🔄 Repositorio remoto (GitHub)
++==========================================+
+git remote add origin https://github.com/usuario/repositorio.git
+<!-- Conecta el repositorio local a uno remoto (por ejemplo, en GitHub). -->
+
+<!-- Sube tus commits al repositorio remoto por primera vez. -->
+git push -u origin main
+
+<!-- Sube tus commits al remoto (si ya está configurado). -->
+git push
+
+<!-- Trae cambios desde el repositorio remoto a tu copia local. -->
+git pull
+
+<!-- Crea una copia local desde un repositorio remoto. -->
+git clone https://github.com/usuario/repositorio.git
+
++==========================================+
+            🔀 Ramas (Branches)
++==========================================+
+git branch
+<!-- Muestra las ramas existentes. -->
+
+<!-- Crea una nueva rama. -->
+git branch nombre_rama
+
+<!-- Cambia a otra rama. -->
+git checkout nombre_rama
+
+<!-- Crea y cambia a una nueva rama. -->
+git checkout -b nueva_rama
+
+<!-- Une los cambios de una rama a la rama actual. -->
+git merge nombre_rama
+
+
+<!-- Crea un nuevo repositorio Git en el directorio actual. -->
+git config --global user.name "Tu Nombre"
+git config --global user.email "tu@email.com"
+

@@ -51,7 +51,7 @@ rman target/
 -- 3.Reorganiza se lanza desde el rman
 crosscheck archivelog all;
 -- 4.Elimina ultima aplicada desde rman
-delete force archivelog until sequence 182316 thread 1;
+delete force archivelog until sequence 4353 thread 1;
 delete force archivelog until sequence 581440 thread 2;
 delete force archivelog until sequence 321816 thread 3;
 --delete force archivelog until sequence 217226 thread 4;

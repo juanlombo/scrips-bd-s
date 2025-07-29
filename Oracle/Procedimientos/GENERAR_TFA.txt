@@ -1,0 +1,36 @@
+#####Generar los archivos de diagnóstico
+
+##Si no se reconoce la ruta del $TFA_HOME ejecutar 
+> which tfactl
+
+##Y ejecuta con esa ruta completa, por ejemplo:
+> which tfactl
+Resultado: /usr/bin/tfactl
+> /usr/bin/tfactl diagcollect -srdc ora600
+
+##Se pone la fecha y hora del alert donde se presento el error
+Enter the time of the ORA-00600 [YYYY-MM-DD HH24:MI:SS,<RETURN>=ALL] : 2025-07-16 23:02:41
+
+##Colocar nombre la BD 
+Enter the Database Name [Required for this SRDC] : CKPR
+
+##INICIO DE LA EJECUCIÓN
+Database Name CKPR was specified however this database has a Database Unique Name of CKPRDG.
+ Database Unique Name CKPRDG set for CKPR.
+
+
+Components included in this collection: OS DATABASE NOCHMOS ASM SOSREPORT
+
+Preparing to execute support diagnostic scripts.
+
+Collecting data for local node(s).
+
+The session timezone is -05. However, AHF collection will interpret the provided time in the system timezone, which is COT.
+Scanning files from 2025-07-16 22:32:41 COT to 2025-07-16 23:32:41 COT
+
+Collection Id : 20250717020816alkexadr-xa9kq1
+
+Waiting up to 120 seconds for collection to start
+
+
+##Después de eso, el tfactl comenzará a recolectar los archivos automáticamente. Te generará un zip (en la ruta de trabajo del TFA)

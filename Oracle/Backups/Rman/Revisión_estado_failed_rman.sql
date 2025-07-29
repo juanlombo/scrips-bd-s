@@ -15,14 +15,14 @@ SELECT SESSION_RECID, to_char(r.start_time, 'YYYY-MM-DD')fecha_inicio,to_char(r.
        ,r.time_taken_display tiempo_tomado,substr(r.status,1,25)  estado, r.input_type tipo, rpad(r.output_device_type,11,chr(126))   dispositivo
        , lpad(r.input_bytes_display,11,chr(126))  tam_entrada, lpad(r.output_bytes_display,11,chr(126)) tam_salida 
   FROM (select   SESSION_RECID, command_id, start_time, time_taken_display, status, input_type, output_device_type, input_bytes_display, output_bytes_display
-               , output_bytes_per_sec_display from v$rman_backup_job_details order by start_time DESC) r WHERE rownum < 30;
+               , output_bytes_per_sec_display from v$rman_backup_job_details order by start_time DESC) r WHERE rownum < 20;
  
 
 /************   consultar el session_recid   ********************/
 
 select output
 from v$rman_output
-where session_recid = 1835521
+where session_recid = 107923
 order by recid ;
 
 -- Estas estan en el nodo2 de bct prod
