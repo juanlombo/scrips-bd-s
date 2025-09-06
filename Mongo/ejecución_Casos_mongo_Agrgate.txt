@@ -8,13 +8,13 @@
 
 # Reviamos el sqcript compartido donde se tiene que revisar el salto de linea  
 # Nos conectamos a la Base de datos afrodita (10.15.59.21) Siscol102
-# Buscamos la coleccion donde se va a realizar el agregate 
-# Damos lcicl sobre la colección y nos vamos al apartado superiro Derecho Aggrefations 
+# Nos conectamos a la Base de datos Afrodita
+# Desplegamos la flechita de la BD de afrodita y Buscamos la coleccion donde se va a realizar el agregate 
+# Damos clic sobre la colección y nos vamos al apartado superiro Derecho Aggrefations 
 # En la parte superiror derecha seleciionamos </> TEXT 
-# Despues de seleccionar TEXT dentro de los corchetes ponemos el escript 
-# En l parte superiror derecha dejamos el "Max time en MS = 600000"
-# Despues seleccionamos Export en la parte superiro derecha, y ponemos csv y seleccionamos 
-  la ruta para guardar el archivo 
+# Despues de seleccionar TEXT dentro de los corchetes ponemos el escript, sin incluir la colección
+# En options de la parte superiror derecha dejamos el "Max time en MS = 600000"
+# Despues seleccionamos Export en la parte inferior derecha, y ponemos csv y seleccionamos la ruta para guardar el archivo 
 
 ##############################
 # EJEMPLO DE SCRIPT          #

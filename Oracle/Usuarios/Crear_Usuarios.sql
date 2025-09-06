@@ -1,11 +1,11 @@
 +========================================================================+ 
 |                  CONSULTAR USUARIO                                     |
 +========================================================================+ 
-SELECT USERNAME,ACCOUNT_STATUS,LOCK_DATE,EXPIRY_DATE FROM DBA_USERS WHERE USERNAME LIKE '%JUANLOMBO%';
+SELECT USERNAME,ACCOUNT_STATUS,LOCK_DATE,EXPIRY_DATE FROM DBA_USERS WHERE USERNAME LIKE '%HENRY%';
 ----CAMBIAR A OPEN
 ALTER USER METRO account unlock;
 -----CAMBIAR CONTRASEÑA
-ALTER USER ORDS_PUBLIC_USER IDENTIFIED BY "oRds_Public2025**" ACCOUNT UNLOCK;
+ALTER USER C##HLOPEZ  IDENTIFIED BY "C2025#HLOPEZ**" ACCOUNT UNLOCK;
 
 YXMWHC9b2
 
@@ -16,8 +16,8 @@ ALTER USER SQL_JDALVAREZ ACCOUNT LOCK;
 |                   PRUEBA DE CONEXION                                   |
 +========================================================================+
 sqlplus /nolog
-@> CONNECT ADM1006352007/C0l0mB1a_2025%
-
+@> CONNECT C##HLOPEZ/C2025#HLOPEZ**
+CONNECT C##HLOPEZ/C2025#HLOPEZ**@ZFPEFMCNN
 
        /*con pdb*/
 @> CONNECT DBSNMP/DmjY7UFH_CnusBE6Z*fAH@PDB
@@ -43,7 +43,7 @@ ALTER USER SQ_JSUAREZ_SOFKA ACCOUNT EXPIRE;
 =========================================================================+
 SELECT username, account_status,lock_date,created, profile, last_login   
 FROM DBA_USERS                                                           
-WHERE USERNAME = 'PRUCONEXION';    
+WHERE USERNAME = 'C##HLOPEZ';    
                                     
 +========================================================================+ 
         CONSULTAR PRIVILEGIOS QUE TIENE UN ESQUEMA EN LAS TABLAS         |
@@ -55,12 +55,11 @@ WHERE GRANTEE = 'FRONT' AND (PRIVILEGE = 'SELECT' OR PRIVILEGE = 'INSERT' OR PRI
 SELECT 
     username,
     account_status,
-    password_expiry,
     profile
 FROM 
     dba_users
 WHERE 
-    username = 'pruconexion';
+    username = 'C##HLOPEZ';
 
 
 +=================================================================================+
@@ -83,6 +82,11 @@ GRANT SELECT ON ESB_SAP.LISTA_PRECIOS TO jhonatan_leiva;
 --le otorga al usuario permiso de solo lectura (SELECT) sobre cualquier tabla de cualquier esquema en la base de datos, con algunas excepciones.
 GRANT SELECT ANY TABLE TO "1032446598";
 
+SELECT owner, table_name, privilege
+FROM dba_tab_privs
+WHERE 
+    grantee = 'C##TSALCEDO';
+
 
 +=================================================================================+
 |                  CAMBIAR DE PROFILE O ASIGNAR PROFILE                           |
@@ -96,7 +100,17 @@ ALTER USER usuario_prueba PROFILE PRUEBA;
 
 GRANT CONNECT, RESOURCE TO jhonatan_leiva;
 
-
+/* Construir grant select */
+WITH TBLS AS (
+	SELECT TABLE_NAME
+	FROM DBA_TABLES
+	WHERE OWNER = 'ZFWEB'
+	ORDER BY TABLE_NAME
+)
+SELECT 'GRANT SELECT ON ZFWEB ' || t.TABLE_NAME || ' TO TEST_USER;'
+FROM TBLS t 
+;
+ 
 +=========================================================================+ 
 		     	 verificar usuario USUARIO                                |
 +=========================================================================+
@@ -198,6 +212,19 @@ GRANT SELECT ON metro.log_mraweb TO SQL_AURREA;
 GRANT SELECT ON metro.recibos_transp TO SQL_AURREA;
 
 
+/* Construir grant select */
+WITH TBLS AS (
+	SELECT TABLE_NAME
+	FROM DBA_TABLES
+	WHERE OWNER = 'ZFWEB'
+	ORDER BY TABLE_NAME
+)
+SELECT 'GRANT SELECT ON ZFWEB ' || t.TABLE_NAME || ' TO TEST_USER;'
+FROM TBLS t 
+;
+ 
+
+
 /*Permite al usuario ejecutar (usar) la función METRO.FN_SOBRANTES_CONCILIACION*/
 
 GRANT EXECUTE ON metro.fn_sobrantes_conciliacion TO SQL_AURREA;
@@ -216,14 +243,11 @@ FROM dba_tab_privs
 WHERE grantee = 'SQL_AURREA'
 AND name = 'FN_SOBRANTES_CONCILIACION';
 
-
-
-
-
-
-
-
-
+CREATE USER HENRYPEREZ IDENTIFIED BY "HeN7r1p325***"
+DEFAULT TABLESPACE USERS
+TEMPORARY TABLESPACE TEMP
+PROFILE DEFAULT
+PASSWORD EXPIRE;
 
 
 
@@ -281,3 +305,48 @@ AND name = 'FN_SOBRANTES_CONCILIACION';
 
 
 C0l0mB1a_2025
+
+
+
+
+
+
+-- Otorgar privilegios de SELECT sobre las tablas del esquema AUDITORIA
+GRANT SELECT ON AUDITORIA.TZFW_AUDITORIA_SERVICIOS_03062025 TO C##TSALCEDO;
+GRANT SELECT ON AUDITORIA.TZFW_AUDITORIA_SERVICIOS_20200302 TO C##TSALCEDO;
+GRANT SELECT ON AUDITORIA.TZFW_AUDITORIA_SERVICIOS_20200326 TO C##TSALCEDO;
+GRANT SELECT ON AUDITORIA.TZFW_CONTROL_NOTIFICACION TO C##TSALCEDO;
+GRANT SELECT ON AUDITORIA.TZFW_ERRORES_DUTAS TO C##TSALCEDO;
+GRANT SELECT ON AUDITORIA.TZFW_HOMOLOGACION_DUTAS TO C##TSALCEDO;
+GRANT SELECT ON AUDITORIA.TZFW_PARAM_GENERALES_INTEGRAC TO C##TSALCEDO;
+GRANT SELECT ON AUDITORIA.TZFW_PARAMETROS TO C##TSALCEDO;
+GRANT SELECT ON AUDITORIA.TZFW_TRANSACCIONES TO C##TSALCEDO;
+GRANT SELECT ON AUDITORIA.TZFW_TRAZA_ERRORES TO C##TSALCEDO;
+
+
+SELECT username
+FROM dba_users 
+WHERE username = 'AUDITORIA';
+
+
+SELECT owner, table_name, privilege
+FROM dba_tab_privs
+WHERE grantee = 'C##TSALCEDO'
+  AND owner = 'AUDITORIA'
+  AND table_name IN (
+    'TZFW_AUDITORIA_SERVICIOS_20200302',
+    'TZFW_AUDITORIA_SERVICIOS_20200326',
+    'TZFW_CONTROL_NOTIFICACION',
+    'TZFW_ERRORES_DUTAS',
+    'TZFW_HOMOLOGACION_DUTAS',
+    'TZFW_PARAM_GENERALES_INTEGRAC',
+    'TZFW_PARAMETROS',
+    'TZFW_TRANSACCIONES',
+    'TZFW_TRAZA_ERRORES',
+    'TZFW_AUDITORIA_SERVICIOS_03062025'
+  );
+
+
+
+  col OWNER for a20                    
+ col PRIVILEG for a20                                                                                   

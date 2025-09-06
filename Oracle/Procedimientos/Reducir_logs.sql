@@ -19,6 +19,32 @@ find . -name "*.xml" -mtime +1 -type f -exec rm -rf {} \;
 
 SHOW PARAMETER audit_trail;
 
+---TODOS LOS FS
+df -kP | /usr/bin/awk '
+NR==1 { printf "%-30s %10s %10s %10s %6s %s\n","Filesystem","SizeMB","UsedMB","AvailMB","Use%","Mount"; next }
+{ printf "%-30s %10.1f %10.1f %10.1f %6s %s\n", $1, $2/1024, $3/1024, $4/1024, $5, $6 }'
+
+---SOLO UN FS
+bdf /home | /usr/bin/awk 'NR==2{
+  printf "Size: %.1f MB  Used: %.1f MB  Avail: %.1f MB  Use: %s  Mount: %s\n",
+         $2/1024, $3/1024, $4/1024, $5, $6
+}'
+
+
+du -sk * 2>/dev/null | sort -nr | /usr/bin/awk '{printf "%8.1f MB\t%s\n", $1/1024, $2}'
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 SET LINESIZE 180
 SET PAGESIZE 50

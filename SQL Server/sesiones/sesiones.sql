@@ -1,3 +1,9 @@
+
+exec sp_whoisactive
+
+
+EXEC sp_WhoIsActive @get_plans = 1;
+
 -- ===================================================
 			-- INFORMACIÓN DETALLADA DE LA SESIÓN
 -- ===================================================
@@ -48,3 +54,19 @@ FROM sys.dm_exec_query_profiles
 WHERE session_id=113
 GROUP BY node_id,physical_operator_name  
 ORDER BY node_id;
+
+
+################################################
+-- saber quién inició esa sesión y desde dónde:
+################################################
+SELECT
+    s.session_id,
+    s.login_name,
+    s.host_name,
+    s.program_name,
+    s.client_interface_name,
+    s.login_time,
+    s.last_request_start_time,
+    s.last_request_end_time
+FROM sys.dm_exec_sessions s
+WHERE s.session_id = 89;

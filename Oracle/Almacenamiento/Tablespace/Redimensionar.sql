@@ -26,7 +26,7 @@ dba_tablespaces tbs
 where tot.tablespace_name = tbs.tablespace_name  
 and fre.tablespace_name(+) = tbs.tablespace_name  
 --and tbs.TABLESPACE_NAME  Like ('%%PSINDEX%')  
-and tbs.TABLESPACE_NAME  = ('ANA_INDEX')
+and tbs.TABLESPACE_NAME  = ('UNDOTBS2')
 group by tbs.tablespace_name, tot.bytes/1024, tot.bytes  
 order by "% Usado" desc;
 
@@ -61,7 +61,13 @@ and tbs.TABLESPACE_NAME  Like ('&1')
 group by tbs.tablespace_name, tot.bytes/1024, tot.bytes 
 order by "% Usado" desc;
 
-datos
+TABCAMASGENF_DAT
+
+
+-- Confirmar el tamaño de bloque del tablespace
+SELECT tablespace_name, block_size
+FROM dba_tablespaces
+WHERE tablespace_name = 'PSIMAGE2';
 
 
 +==================================================================================================+

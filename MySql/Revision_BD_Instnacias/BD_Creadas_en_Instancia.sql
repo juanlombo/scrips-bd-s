@@ -79,13 +79,13 @@ WHERE
 ----- BUSCAR QUE BD TIENE LA TABLA SIN CONECTARSE A UNA BD 
 SELECT table_schema, table_name
 FROM information_schema.tables
-WHERE table_name = 'sessions';
+WHERE table_name = 'configurations ';
 
 -- LISRAR BD
 SHOW DATABASES;
 
 -- CONECTARSE A LA BD 
-USE nombre_de_base_datos;
+USE usuarios_distribuciones;
 
 ---- REVISAR BD 
 SELECT DATABASE();
@@ -113,4 +113,53 @@ SELECT
 FROM information_schema.tables
 WHERE table_schema = 'usuarios_distribuciones'
   AND table_name = 'sessions';
+
+
+
+Esmas el espacio libre que el espacio que ocupa= fragmentación 
+compactar la tabla y el indice se compacta y los datos se agrupan en hojas de datos 
+
+
+
+
+-- crea la tabla vacía con la misma estructura (PK/índices, engine, charset)
+CREATE TABLE `configurations_BK_20250815` LIKE `configurations`;
+
+-- copia todos los datos
+INSERT INTO `configurations_BK_20250815`
+SELECT * FROM `configurations`;
+
++=============================================
+|--REVISAR FRAGMENTACIÓN DE TABLA  
++=============================================
+SELECT 
+    table_schema,
+    table_name,
+    engine,
+    ROUND(data_length / 1024 / 1024, 2) AS data_MB,
+    ROUND(index_length / 1024 / 1024, 2) AS index_MB,
+    ROUND((data_length + index_length) / 1024 / 1024, 2) AS total_MB,
+    ROUND(data_free / 1024 / 1024, 2) AS free_MB
+FROM information_schema.tables
+WHERE table_schema = 'usuarios_distribuciones'
+  AND table_type = 'BASE TABLE'
+ORDER BY free_MB DESC;
+
+
+
+#################################################
+# VALIDAR SELECTIVIDAD DE UN CAMPO EN UNA TABLA #
+################################################
+SELECT 
+  COUNT(*) AS total_registros,
+  COUNT(DISTINCT sesskey) AS registros_unicos,
+  ROUND(COUNT(DISTINCT sesskey) / COUNT(*) * 100, 2) AS selectividad_porcentaje
+FROM usuarios_distribuciones.sessions;
+
+
+#################################################
+# CANT DE REGISTROS UNICOS POR EL CAMPO         #
+################################################
+SELECT COUNT(DISTINCT sesskey) AS total_sesskey_unicos
+FROM usuarios_distribuciones.sessions;
 

@@ -95,4 +95,36 @@ FROM pg_stat_database;
 
 
 
+##########################################
+#   Identificar poll max de conexiones
+##########################################
+show max_connections;
 
+##########################################
+#
+##########################################
+-- Segunda parte 
+select datname, usename, state, count(1)
+from pg_stat_activity
+group by 1,2,3
+order by 4 desc
+;
+
+##########################################
+# Revisar tipo de conexiones por app
+##########################################
+-- Tercera parte
+select datname, usename, application_name, client_addr, count(1) num_conexiones,sum(count(1)) over () as total_conexiones, round((count(1) / sum(count(1)) over ())*100,2) as porc_uso_conexiones,now()
+ from pg_stat_activity group by 1,2,3,4 order by num_conexiones desc;
+ 
+
+##########################################
+# Matar sesiones en estado idle 
+##########################################
+-- Finalizar sesiones si superan las 700 conexiones en uso
+-- Recordar que el pool max de conexiones esta en 1000
+SELECT pg_terminate_backend(pid)
+FROM pg_stat_activity
+WHERE state = 'idle'
+  AND usename = 'pegaso' -- User App
+  AND pid <> pg_backend_pid();  -- excluye tu propia sesión

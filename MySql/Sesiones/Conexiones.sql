@@ -33,6 +33,24 @@ FROM information_schema.innodb_lock_waits w
 JOIN information_schema.innodb_trx b ON b.trx_id = w.blocking_trx_id
 JOIN information_schema.innodb_trx r ON r.trx_id = w.requesting_trx_id;
 
+
+
+
+
+
+/* PARA VERSIONES SUPERUIORES */
+SELECT
+  ilw.waiting_trx_id,
+  ilw.waiting_pid    AS waiting_thread,
+  ilw.waiting_query,
+  ilw.blocking_trx_id,
+  ilw.blocking_pid   AS blocking_thread,
+  ilw.blocking_query
+FROM sys.innodb_lock_waits AS ilw;
+
+
+
+
 ======================================================================================================================
 -- 												----****CONEXIONES ACTIVAS****-	
 ======================================================================================================================	
@@ -93,3 +111,36 @@ WHERE
 ORDER BY 
     total_time_seconds DESC
 LIMIT 5;
+
+
+-- Conexiones dormidas que no se cierran
+SELECT id, user, host, time
+FROM information_schema.processlist
+WHERE command='Sleep' AND time > @@wait_timeout
+ORDER BY time DESC;
+
+-- Consultas activas y lentas
+SELECT id, user, host, db, time, state, LEFT(info,200) AS sql_sample
+FROM information_schema.processlist
+WHERE command <> 'Sleep'
+ORDER BY time DESC
+LIMIT 50;
+
+-- Errores de conexión / picos recientes
+SHOW GLOBAL STATUS LIKE 'Aborted_connects';
+SHOW GLOBAL STATUS LIKE 'Connections';
+SHOW GLOBAL STATUS LIKE 'Connection_errors_%';
+
+
+
+SELECT * FROM sys.host_summary ORDER BY current_connections DESC;
+SELECT * FROM sys.user_summary ORDER BY current_connections DESC;
+SELECT * FROM sys.processlist ORDER BY time DESC LIMIT 50;
+
+
+-- Solo consultas con más de 5 segundos de ejecución
+SELECT id, user, host, db, time, state, LEFT(info,200) AS query_sample
+FROM information_schema.processlist
+WHERE command <> 'Sleep'
+  AND time > 5
+ORDER BY time DESC;

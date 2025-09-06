@@ -1,0 +1,186 @@
+### Upgrade Timezone ZFPDORADN ###
+
+    CON_ID CON_NAME                       OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+        31 ZFPDORADN                      READ WRITE NO
+        32 ZFPEFMCN                       READ WRITE NO
+        33 ZFPEICOLN                      READ WRITE NO
+        34 ZFPEFMCNN                      READ WRITE NO
+        36 ZFEVAN01                       READ WRITE NO
+
+alter pluggable database ZFPDORADN close immediate; 
+
+SQL> alter pluggable database ZFPDORADN close immediate;
+
+Pluggable database altered.
+       
+alter pluggable database ZFPDORADN open UPGRADE;
+
+SQL> alter pluggable database ZFPDORADN open UPGRADE;
+
+Pluggable database altered.
+
+alter session set container=ZFPDORADN;
+
+SQL> alter session set container=ZFPDORADN;
+
+Session altered.
+
+EXEC DBMS_DST.CREATE_AFFECTED_TABLE('AFFECTED_TABLES');
+
+SQL> EXEC DBMS_DST.CREATE_AFFECTED_TABLE('AFFECTED_TABLES');
+
+PL/SQL procedure successfully completed.
+
+EXEC DBMS_DST.CREATE_ERROR_TABLE('ERR_TABLE');
+
+SQL> EXEC DBMS_DST.CREATE_ERROR_TABLE('ERR_TABLE');
+
+PL/SQL procedure successfully completed.
+
+exec DBMS_DST.BEGIN_PREPARE(38);
+
+SQL> exec DBMS_DST.BEGIN_PREPARE(38);
+
+PL/SQL procedure successfully completed.
+
+EXEC DBMS_DST.find_affected_tables;
+
+SQL> EXEC DBMS_DST.find_affected_tables;
+
+PL/SQL procedure successfully completed.
+
+exec DBMS_DST.END_PREPARE();
+
+SQL> exec DBMS_DST.END_PREPARE();
+
+PL/SQL procedure successfully completed.
+
+SELECT * FROM sys.dst$affected_tables;
+SELECT * FROM sys.dst$error_table;
+
+SQL> SELECT * FROM sys.dst$affected_tables;
+SELECT * FROM sys.dst$error_table;
+no rows selected
+
+SQL>
+
+no rows selected
+
+SQL> show pdbs
+
+    CON_ID CON_NAME                       OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+        31 ZFPDORADN                        MIGRATE    YES
+
+SET SERVEROUTPUT ON
+DECLARE
+  l_tz_version PLS_INTEGER;
+BEGIN
+  l_tz_version := 38;
+  DBMS_OUTPUT.put_line('l_tz_version=' || l_tz_version);
+  DBMS_DST.begin_upgrade(l_tz_version);
+END;
+/
+
+SQL> SET SERVEROUTPUT ON
+DECLARE
+  l_tz_version PLS_INTEGER;
+BEGIN
+  l_tz_version := 38;
+  DBMS_OUTPUT.put_line('l_tz_version=' || l_tz_version);
+  DBMS_DST.begin_upgrade(l_tz_version);
+END;
+/
+SQL>   2    3    4    5    6    7    8
+l_tz_version=38
+An upgrade window has been successfully started.
+
+PL/SQL procedure successfully completed.
+
+alter pluggable database ZFPDORADN close immediate;
+
+SQL> SQL> alter pluggable database ZFPDORADN close immediate;
+
+Pluggable database altered.
+       
+alter pluggable database ZFPDORADN open;
+
+SQL> alter pluggable database ZFPDORADN open;
+
+Pluggable database altered.
+
+SQL> alter session set container=ZFPDORADN;
+
+Session altered.
+
+SQL> show pdbs
+
+SQL> show pdbs
+
+    CON_ID CON_NAME                       OPEN MODE  RESTRICTED
+---------- ------------------------------ ---------- ----------
+        31 ZFPDORADN                      READ WRITE NO
+
+SET SERVEROUTPUT ON
+DECLARE
+  l_failures   PLS_INTEGER;
+BEGIN
+  DBMS_DST.upgrade_database(l_failures);
+  DBMS_OUTPUT.put_line('DBMS_DST.upgrade_database : l_failures=' || l_failures);
+  DBMS_DST.end_upgrade(l_failures);
+  DBMS_OUTPUT.put_line('DBMS_DST.end_upgrade : l_failures=' || l_failures);
+END;
+/
+
+SQL> SET SERVEROUTPUT ON
+DECLARE
+  l_failures   PLS_INTEGER;
+BEGIN
+  DBMS_DST.upgrade_database(l_failures);
+  DBMS_OUTPUT.put_line('DBMS_DST.upgrade_database : l_failures=' || l_failures);
+  DBMS_DST.end_upgrade(l_failures);
+  DBMS_OUTPUT.put_line('DBMS_DST.end_upgrade : l_failures=' || l_failures);
+END;
+/SQL>   2    3    4    5    6    7    8    9
+Table list: "GSMADMIN_INTERNAL"."AQ$_CHANGE_LOG_QUEUE_TABLE_S"
+Number of failures: 0
+Table list: "GSMADMIN_INTERNAL"."AQ$_CHANGE_LOG_QUEUE_TABLE_L"
+Number of failures: 0
+Table list: "MDSYS"."SDO_DIAG_MESSAGES_TABLE"
+Number of failures: 0
+Table list: "DVSYS"."AUDIT_TRAIL$"
+Number of failures: 0
+Table list: "DVSYS"."SIMULATION_LOG$"
+Number of failures: 0
+DBMS_DST.upgrade_database : l_failures=0
+An upgrade window has been successfully ended.
+DBMS_DST.end_upgrade : l_failures=0
+
+PL/SQL procedure successfully completed.
+
+SQL> SELECT * FROM v$timezone_file;
+
+FILENAME                                                        VERSION
+------------------------------------------------------------ ----------
+    CON_ID
+----------
+timezlrg_38.dat                                                      38
+
+SELECT property_name, property_value
+FROM   database_properties
+WHERE  property_name LIKE 'DST_%'
+ORDER BY property_name; 
+
+PROPERTY_NAME
+--------------------------------------------------------------------------------
+PROPERTY_VALUE
+--------------------------------------------------------------------------------
+DST_PRIMARY_TT_VERSION
+38
+
+DST_SECONDARY_TT_VERSION
+0
+
+DST_UPGRADE_STATE
+NONE

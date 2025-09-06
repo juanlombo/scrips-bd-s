@@ -48,10 +48,9 @@ expdp \"/ as sysdba\" parfile=exportdb_devbct2_20250618.par
  ===================================================================================
 -- [oracle@PBDWMS03 export]$ cat exportdb.par
 -- directory=BACKUP
--- dumpfile=expdp_AUDITORY_HISTORY_dic2022.dmp
--- logfile=expdp_AUDITORY_HISTORY_dic2022.log
+-- dumpfile=exportdb_ZFRANCA_ZFWEB.dmp
+-- logfile=exportdb_ZFRANCA_ZFWEB_.log
 -- exclude=statistics
--- QUERY=OSB.AUDITORY_HISTORY:"WHERE FECHA_CREACION BETWEEN to_date('2022-12-01','yyyy-mm-dd') and  to_date('2023-01-01','yyyy-mm-dd')"
 -- tables=OSB.AUDITORY_HISTORY
 -- ESTIMATE_ONLY=YES
 
@@ -71,6 +70,9 @@ expdp \"/ as sysdba\" parfile=exportdb_devbct2_20250618.par
 
 Dar permiosos de ejecución 
 chmod +x import_KOBI_TIENDAS_20250320.sh
+
+
+
 
 
 CREATE DIRECTORY EXPDP_BKP AS '/u02/export_190625';
@@ -107,29 +109,46 @@ AND owner = 'FRONT';
  ===================================================================================
  						CREACIÓN sh para expdp PDB
  ===================================================================================
-vi exportdb_OSB_20250326.sh
-export ORACLE_SID=INTEGRADOR
-expdp \"/ as sysdba\" parfile=exportdb_OSB_20250326.par
+vi exportdb_ZFRANCA_ZFWEB.sh
+export ORACLE_PDB_SID=ZFRANCA
+expdp \"/ as sysdba\" parfile=exportdb_ZFRANCA_ZFWEB.par
 
 
 ---- nohup exportdb_KOBI_TIENDAS_20250320.sh &
 
-vi exportdb_OSB_20250326.par
-directory=BACKUP
-dumpfile=exportdb_OSB_20250326.dmp
-logfile=exportdb_OSB_20250326.log
+vi exportdb_ZFRANCA_ZFWEB.par
+directory=DATA_PUMP_DIR_2
+dumpfile=exportdb_ZFRANCA_ZFWEB.dmp
+logfile=exportdb_ZFRANCA_ZFWEB.log
+content=METADATA_ONLY
 exclude=statistics
-SCHEMAS=OSB
-EXCLUDE=TABLE:"IN ('OSB.AUDITORY','OSB.AUDITORY_HIST')"
+SCHEMAS=ZFWEB
 
 
-
+expdp system@ZFRANCA parfile=exportdb_ZFRANCA_ZFWEB.par estimate_only=YES
 
 Dar permiosos de ejecución 
-chmod +x import_KOBI_TIENDAS_20250320.sh
+chmod +x exportdb_ZFRANCA_ZFWEB.sh
 
 
-expdp \'/ as sysdba\' directory=BACKUP dumpfile=exportdb_OSB_20250326.dmp logfile=exportdb_OSB_20250326.log exclude=statistics schemas=OSB exclude=TABLE:"IN ('AUDITORY','AUDITORY_HIST')" estimate_only=YES
+expdp \'/ as sysdba\' directory=DATA_PUMP_DIR_2 dumpfile=exportdb_ZFRANCA_ZFWEB.dmp logfile=exportdb_ZFRANCA_ZFWEB.log exclude=statistics schemas=ZFWEB estimate_only=YES
+
+
+#####################################
+#   ---    IMPORT                   #
+#####################################
+vi import_ZFRANCA_ZFWEB.par
+directory=DATA_PUMP_DIR_2
+dumpfile=exportdb_ZFRANCA_ZFWEB.dmp
+logfile=importdb_ZFRANCA_ZFWEB.log
+schemas=ZFWEB
+content=METADATA_ONLY
+exclude=statistics
+
+vi import_ZFRANCA_ZFWEB.sh
+export ORACLE_PDB_SID=
+expdp \"/ as sysdba\" parfile=importdb_ZFRANCA_ZFWEB.par
+
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
