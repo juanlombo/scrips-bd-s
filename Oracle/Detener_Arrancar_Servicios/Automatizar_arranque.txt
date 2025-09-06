@@ -1,0 +1,25 @@
++====================================================================================================
+|  SI ES STAND ALONE SE MODIFICA LO SIGUIENTE PARA QUE LAS BD ARRANQUEN CUANDO UN SERVER SE REINCIA
++====================================================================================================
+cat /ect/oratab
+[oracle@localhost ~]$ cat /etc/oratab
+
+orcl:/u01/app/oracle/product/19.3.0/db_1:N
+curso:/u01/app/oracle/product/19.3.0/db_1:N
+multi:/u01/app/oracle/product/19.3.0/db_1:N
+
+--Se edita y para cada línea deja la última columna :Y
+vi /ect/oratab
+orcl:/u01/app/oracle/product/19.3.0/db_1:Y
+curso:/u01/app/oracle/product/19.3.0/db_1:Y
+multi:/u01/app/oracle/product/19.3.0/db_1:Y
+
++========================================
+|   CONECTARSE SOLO ESCRIBIENDO EL SID 
++=======================================
+[oracle@localhost ~]$ alias curso='export ORACLE_SID=curso; sqlplus / as sysdba'
+[oracle@localhost ~]$ source ~/.bash_profile
+
+CON PDB 
+alias SID='export ORACLE_SID=SID; echo "alter session set container=PDB"; echo "show con_name;";sqlplus / as sysdba'
+
