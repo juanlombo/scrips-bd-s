@@ -65,3 +65,16 @@ git merge nombre_rama
 git config --global user.name "Tu Nombre"
 git config --global user.email "tu@email.com"
 
+
+Opción 1: Mantener historial (merge normal)
+
+Si quieres que pcseti reciba lo que hay en main pero sin perder sus commits:
+
+# Asegúrate de estar actualizado
+git fetch origin
+
+# Cambia a la rama pcseti
+git checkout pcSeti
+
+# Trae los cambios de main a pcseti
+git merge origin/main
