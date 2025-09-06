@@ -1,0 +1,7 @@
+SELECT name, recovery_model_desc, log_reuse_wait_desc
+FROM sys.databases WHERE name='OnBase';
+
+DBCC SQLPERF(LOGSPACE);  -- % de uso por BD
+-- o
+SELECT database_id, total_log_size_mb, used_log_space_mb, used_log_space_percent
+FROM sys.dm_db_log_space_usage;

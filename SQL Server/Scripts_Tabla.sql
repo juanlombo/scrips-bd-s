@@ -19,6 +19,17 @@ SELECT *
 INTO SALF.factDiarioAfiliacionRecaudoPO_BK_20250507
 FROM eschema.NombreTablaOriginal;
 
++==========================================================+
+|-- REVISAR A QUE LE PEGA SINONIMO LE PEGA LA VISTA        |
++==========================================================+
+
+
+
++=============================================+
+|     --   Estimar compresión PAGE            |
++=============================================+
+
+
 
 +=============================================+
 |     --   Estimar compresión PAGE            |
@@ -59,130 +70,4 @@ EXEC sp_estimate_data_compression_savings
 
 
 
-+===============================================================+
-|   --Analiza una tabla y sugiere el tipo de compresión válido  |
-+===============================================================+
 
-DECLARE @schema_name SYSNAME = 'DW';
-DECLARE @table_name SYSNAME = 'SaldoAfiliadosModeloProductos'; -- cambia el nombre aquí
-
--- Verifica si tiene índices columnstore
-IF EXISTS (
-    SELECT 1
-    FROM sys.indexes i
-    INNER JOIN sys.objects o ON i.object_id = o.object_id
-    WHERE o.name = @table_name
-      AND SCHEMA_NAME(o.schema_id) = @schema_name
-      AND i.type_desc LIKE '%COLUMNSTORE%'
-)
-BEGIN
-    PRINT '✅ La tabla tiene índice COLUMNSTORE. Puedes usar: COLUMNSTORE o COLUMNSTORE_ARCHIVE';
-END
-ELSE
-BEGIN
-    -- Verifica si tiene columnas sparse o tipos no compatibles con compresión
-    IF EXISTS (
-        SELECT 1
-        FROM sys.columns c
-        INNER JOIN sys.objects o ON c.object_id = o.object_id
-        WHERE o.name = @table_name
-          AND SCHEMA_NAME(o.schema_id) = @schema_name
-          AND (
-              c.is_sparse = 1
-              OR c.system_type_id IN (
-                  34, 35, 99, 241, -- image, text, ntext, xml
-                  165,             -- timestamp
-                  98               -- sql_variant
-              )
-          )
-    )
-    BEGIN
-        PRINT '⚠️ La tabla tiene columnas sparse o tipos no compatibles. No se recomienda aplicar ROW ni PAGE compression.';
-    END
-    ELSE
-    BEGIN
-        PRINT '✅ La tabla puede usar: ROW o PAGE compression (almacenamiento por filas)';
-    END
-END
-
-
-
-=============================
-/*PARA VARIAS TABLAS*/
-============================
-
-DECLARE @Tables TABLE (
-    SchemaName SYSNAME,
-    TableName SYSNAME
-);
-
--- Inserta las tablas a evaluar
-INSERT INTO @Tables (SchemaName, TableName)
-VALUES
-('DW',   'SaldoAfiliadosModeloProductos'),
-('ASE',  'AuxAsesoriaAfiliadosProducto_Historico'),
-('ICON', 'FactDetalleDeudasMeta'),
-('PLA',  'FactEncabezadoPlantillas'),
-('ICON', 'FactDetalleDeudas'),
-('DW',   'FactValorFondoPO'),
-('COB',  'FactEstrategiaCobro_tmp'),
-('DW',   'DimExtensionAfiliados'),
-('AUX',  'AuxHitoricosAsignacionAfiliados');
-
-DECLARE @schema_name SYSNAME, @table_name SYSNAME;
-
-DECLARE table_cursor CURSOR FOR
-SELECT SchemaName, TableName FROM @Tables;
-
-OPEN table_cursor;
-FETCH NEXT FROM table_cursor INTO @schema_name, @table_name;
-
-WHILE @@FETCH_STATUS = 0
-BEGIN
-    PRINT '--------------------------------------------------';
-    PRINT '🔍 Tabla: ' + QUOTENAME(@schema_name) + '.' + QUOTENAME(@table_name);
-
-    -- Verifica si tiene índices columnstore
-    IF EXISTS (
-        SELECT 1
-        FROM sys.indexes i
-        INNER JOIN sys.objects o ON i.object_id = o.object_id
-        WHERE o.name = @table_name
-          AND SCHEMA_NAME(o.schema_id) = @schema_name
-          AND i.type_desc LIKE '%COLUMNSTORE%'
-    )
-    BEGIN
-        PRINT '✅ Tiene índice COLUMNSTORE → Puedes usar: COLUMNSTORE o COLUMNSTORE_ARCHIVE';
-    END
-    ELSE
-    BEGIN
-        -- Verifica columnas no compatibles con ROW/PAGE compression
-        IF EXISTS (
-            SELECT 1
-            FROM sys.columns c
-            INNER JOIN sys.objects o ON c.object_id = o.object_id
-            WHERE o.name = @table_name
-              AND SCHEMA_NAME(o.schema_id) = @schema_name
-              AND (
-                  c.is_sparse = 1
-                  OR c.system_type_id IN (
-                      34, 35, 99, 241, -- image, text, ntext, xml
-                      165,             -- timestamp
-                      98               -- sql_variant
-                  )
-              )
-        )
-        BEGIN
-            PRINT '⚠️ Tiene columnas SPARSE o tipos no compatibles → No se recomienda ROW/PAGE';
-        END
-        ELSE
-        BEGIN
-            PRINT '✅ Puedes usar: ROW o PAGE compression';
-        END
-    END
-
-    FETCH NEXT FROM table_cursor INTO @schema_name, @table_name;
-END
-
-CLOSE table_cursor;
-DEALLOCATE table_cursor;

@@ -1,3 +1,4 @@
+
 -- Postgres
 cd /data/PostgreSQL/PMP/
 /usr/pgsql-15/bin/psql -h "10.15.218.2" -p "5432" -d "andromeda" -U pegaso

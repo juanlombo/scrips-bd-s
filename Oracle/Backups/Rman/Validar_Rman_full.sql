@@ -38,7 +38,7 @@ FROM
      from v$rman_backup_job_details
      order by start_time DESC
     ) r
-WHERE r.start_time > sysdate - 25
+WHERE r.start_time > sysdate - 15
 /
 
 ##################################################

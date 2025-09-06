@@ -1,0 +1,32 @@
+Nos llega el sigueinte requerimeinto 
+############################################################################
+#Ejecutar consulta TDP                                                     #   
+#Por favor realizar las siguientes consultas en la base TDP - SIC          #       
+#                                                                          #         
+#Compartir salida en excel.                                                #                     
+#                                                                          #
+#                                                                          #                                     
+#                                                                          #
+#SELECT TOP (1000) [cod_homologacion]                                      #                                     
+#      ,[campo]                                                            #                                 
+#      ,[valor]                                                            #                                 
+#      ,[homologacion]                                                     #                                 
+#  FROM [dbo].[homologacion]                                               #                                     
+#  WHERE campo in ('estadoAutorizacion', 'autorizacionEnviosMs')           #                                                 
+#  ORDER BY campo ASC;                                                     #                             
+#                                                                          #                                 
+#                                                                          #     
+#                                                                          #     
+#                                                                          #                         
+#SELECT TOP (5) [cod_homologacion]                                         #                                     
+#  FROM [dbo].[homologacion]                                               #                                                                     
+#  ORDER BY cod_homologacion DESC;                                         #                                                                     
+############################################################################
+
+PASO 1 nos conectamos al pivote .206
+Paso 2 en el SQL Server Management studio nos conectamos a este server name: srv-eu2-sic-prd.database.windows.net
+                                                                Authentication: Azure Active directory - password
+                                                                Username: car_alkosto@colcomercio.com.co
+                                                                Password: la contraseña se encuentra en el kepass servicodes-cloud azure AWS-cloud azure
+PASO 3 Despues de conectarnos a la instancia, procedemos a ejecutar los scripts en la base de datos db-eu2-sic01-prod
+

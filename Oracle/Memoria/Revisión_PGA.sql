@@ -1,7 +1,9 @@
 -- Verifica el límite actual de PGA
 SHOW PARAMETER pga_aggregate_limit;
 
++====================================================+
 -- Revisar cuánto PGA se está utilizando actualmente
++====================================================+
 SELECT name, ROUND(value / 1024 / 1024, 2) AS value_mb
 FROM     v$pgastat
 WHERE name IN (
@@ -11,7 +13,9 @@ WHERE name IN (
 'aggregate PGA auto target',
 'over allocation count' );
 
++================================================+
 ---- Revisar % de uso referente al limite 
++================================================+
 SELECT
     ROUND(total_pga_inuse / 1024 / 1024, 2) AS total_pga_inuse_mb,
     ROUND(pga_limit / 1024 / 1024, 2) AS pga_limit_mb,
@@ -24,8 +28,9 @@ FROM (
 );
 
 
-
++================================================+
 -- Identificar sesiones con alto consumo de PGA
++================================================+
 SELECT s.sid, s.serial#, p.pga_used_mem / 1024 / 1024 AS pga_used_mb, s.sql_id, 
     s.status, s.program 
 FROM v$process p 
@@ -33,7 +38,12 @@ JOIN v$session s ON p.addr = s.paddr
 WHERE p.pga_used_mem > 100 * 1024 * 1024   -- sesiones con más de 100MB de PGA
 ORDER BY pga_used_mb DESC;
 
++================================================+
 -- Identificar sesiones con alto consumo de PGA
++================================================+
+set lines 900
+col USERNAME form a30
+col PROGRAM form a40
 SELECT 
     s.sid,
     s.serial#,
@@ -54,10 +64,11 @@ FETCH FIRST 10 ROWS ONLY;
 
 
 SELECT * 
-FROM table(DBMS_XPLAN.DISPLAY_CURSOR('749915dgnypsk', NULL, 'ALLSTATS LAST'));
+FROM table(DBMS_XPLAN.DISPLAY_CURSOR('ddn9147nacgrc', NULL, 'ALLSTATS LAST'));
 
-
++========================================+
 -- Identificar quien esta usando mas PGA 
++========================================+
 SELECT s.username, s.program, ROUND(p.pga_used_mem / 1024 / 1024, 2) AS pga_used_mb
 FROM  v$session s
 JOIN v$process p ON s.paddr = p.addr
@@ -67,21 +78,52 @@ ORDER BY pga_used_mb DESC;
 
 ---
 
++========================================+
+|       Consumo de la SGA                |
++========================================+
+COLUMN pool FORMAT A20
+COLUMN total_mb FORMAT 999,999,999
+COLUMN free_mb  FORMAT 999,999,999
+COLUMN used_mb  FORMAT 999,999,999
+COLUMN pct_used FORMAT 999.99
+SELECT pool,
+       ROUND(total/1024/1024) total_mb,
+       ROUND((total-free)/1024/1024) used_mb,
+       ROUND(free/1024/1024) free_mb,
+       ROUND((total-free)*100/total,2) pct_used
+FROM (
+    SELECT pool,
+           SUM(bytes) total,
+           SUM(CASE WHEN name LIKE '%free%' THEN bytes ELSE 0 END) free
+    FROM v$sgastat
+    GROUP BY pool
+);
 
 
-SQL_ID  7wf2advyctpfb, child number 0
--------------------------------------
-select distinct ordnum en_otra_carga    from (Select ordnum
-From Ord_Line           Where Sales_Ordnum = :var_no_ped
-And Client_Id = :var_client_id             and prtnum = :var_articulo
-       Union          Select ordnum            From Ord_Line
-Where Sales_Ordnum = :var_no_ped             And Client_Id =
-:var_client_id             and prtnum = :var_articulo)   where ordnum
-<> :var_ordnum
+-- El shared pool está al 76% → saludable (ideal <80-85%).
+
+-- El buffer cache (fila sin nombre) está al 100%: esto es normal, Oracle siempre usa todo el buffer cache y va reciclando bloques. No es problema.
+
+-- El large pool al 80%: está justo en el límite, ojo si haces RMAN con muchos canales o operaciones paralelas.
+
+-- El streams pool está libre (no lo estás usando).
 
 
-SQL_ID  749915dgnypsk, child number 0
--------------------------------------
-delete USR_TMP_CONFIABILI_CNT a  
-Where a.wh_id = nvl(:1 ,:2 )
 
+
++========================================+
+|   REVISAR MEMORIA DEL SERVER   |  
++========================================+
+free -m -w
+grep -i memavailable /proc/meminfo
+ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%mem | head
+
+# Ver total y disponible (para calcular el % real)
+awk '/MemTotal|MemAvailable/ {print}' /proc/meminfo
+
+# Uso total de memoria (RSS) por GoldenGate en MB
+ps -eo rss,cmd | awk '/gg-source21|gg-target21/ {sum+=$1} END {printf "OGG RSS ~%.1f MB\n", sum/1024}'
+
+# Swap y presión
+free -m -w
+vmstat 1 5

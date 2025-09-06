@@ -214,14 +214,34 @@ col machine format a30
 col osuser format a20
 set lines 500
 set pages 100
-select inst_id, username, sid, serial#, round(last_call_et/60) Min, WAIT_CLASS, event, machine,sql_id
+select inst_id, username, status, sid, serial#, round(last_call_et/60) Min, WAIT_CLASS, event, machine,sql_id
 from gv$session
-where status = 'INACTIVE' 
+where status in ('INACTIVE','ACTIVE')
 and username<>'SYS'
 and username is not null  
 --and username not in('SETIADMIN', 'DBSNMP', ---------##'SYSMAN','GGS_OWNER','GGS_OWNER_2','GGS_OWNER02')
 order by last_call_et asc, 1,2   
 /
+
+
++======================================+
+| -- COUNT SESIONES ACTIVAS E INACTIVAS|
++======================================+
+COLUMN estado FORMAT A10
+COLUMN "# de SESIONES" FORMAT 999
+SELECT  estado,
+  COUNT(*) AS "# de SESIONES"
+FROM (
+  SELECT 
+    CASE 
+      WHEN status = 'ACTIVE' THEN 'ACTIVE'
+      ELSE 'INACTIVE'
+    END AS estado
+  FROM v$session
+)
+GROUP BY estado
+UNION ALL
+SELECT 'TOTAL', COUNT(*) FROM v$session;
 
 +======================================+
 | --    REVISAR SESIONES SYS          |
@@ -243,7 +263,7 @@ ORDER BY last_call_et DESC, inst_id, username;
 set linesize 1500
 col sql_id for 9999999
 col sql_text for a100
-select sql_id, sql_text from v_$sql where sql_id in ('fp2ccg0m74zrs');
+select sql_id, sql_text from v_$sql where sql_id in ('43jtc2ys37a2z');
 
 
 SET LINESIZE 1500
@@ -252,14 +272,14 @@ COLUMN sql_id FORMAT A13
 COLUMN sql_text FORMAT A1000
 SELECT sql_id, sql_text
 FROM v$sql
-WHERE sql_id = '9s0z1a73tu5x8';
+WHERE sql_id = 'gwjr50pphfgpf';
 
 
 SELECT a.sql_text
 FROM gv$sqltext a, 
 gv$session b 
 WHERE a.address = b.sql_address 
-AND a.hash_value = b.sql_hash_value and b.sid=4389 and b.INST_ID=1 ORDER BY a.piece;
+AND a.hash_value = b.sql_hash_value and b.sid=16 and b.INST_ID=2 ORDER BY a.piece;
 +======================================+
 | --  REVISAR QUE EJECUTA EL SID       |
 +======================================+
@@ -267,7 +287,7 @@ SELECT a.sql_text
 FROM gv$sqltext a, 
 gv$session b 
 WHERE a.address = b.sql_address 
-AND a.hash_value = b.sql_hash_value and b.sid=2815 and b.INST_ID=1
+AND a.hash_value = b.sql_hash_value and b.sid=2916 and b.INST_ID=1
 ORDER BY a.piece;
 
 +======================================+
@@ -289,12 +309,15 @@ FROM v$session s
     ,v$process p
     ,v$sql     q
 WHERE s.paddr          = p.addr
-AND   s.sid           = '444'
+AND   s.sid           = '428'
 AND   s.sql_address    = q.address(+)
 AND   s.sql_hash_value = q.hash_value(+);
 
 
-
+SELECT s.sid, s.serial#, s.username, s.program, s.module, s.status
+FROM   gv$session s
+JOIN   gv$sqlarea a ON a.sql_id IN (s.sql_id, s.prev_sql_id)
+WHERE  a.sql_text LIKE '%ZFWEB.TEMP_BLOQUEOS%'
 
 -- Reemplaza :SID y :INST_ID con los valores correctos
 -- Por ejemplo: WHERE s.sid = 1935 AND s.inst_id = 1
@@ -349,7 +372,7 @@ FROM v$session s
     ,v$process p
     ,v$sql     q
 WHERE s.paddr          = p.addr
-AND   p.spid           = '46042'
+AND   p.spid           = '2580086'
 AND   s.sql_address    = q.address(+)
 AND   s.sql_hash_value = q.hash_value(+);
 +======================================+
@@ -552,3 +575,45 @@ SELECT name, value/1024/1024 AS value_mb
 FROM v$pgastat
 WHERE name IN ('aggregate PGA target parameter', 'total PGA allocated', 'maximum PGA allocated');
  
+
+
++======================================+
+|   -- REVISAR PROCESO ASINCRONO       |        
++======================================+
+select *
+from prevcxn1.tsis_parale_procasincronos INNER JOIN prevcxn1.TSIS_PROCESOS_ASINCRONOS ON PASID=PPAIDPROCESOASINCRONO
+inner join prevcxn1.tsis_clase_negociosproasin on CNPID=PPAIDPROCESOASINCRONO
+where ppaid = 15978185
+order by ppafecreacion desc
+
+
+
++======================================+
+|   -- REVISAR PROCESO BD y %      |        
++======================================+
+SET LINESIZE 200
+COL INSTANCE_NAME FOR A12
+COL RESOURCE_NAME FOR A15
+COL CURRENT_UTILIZATION FOR 99999
+COL MAX_UTILIZATION FOR 99999
+COL LIMIT_VALUE FOR A10
+COL USO_PCT FOR A10
+SELECT 
+    i.instance_name,
+    r.resource_name,
+    r.current_utilization,
+    r.max_utilization,
+    r.limit_value,
+    TO_CHAR(ROUND((r.current_utilization / TO_NUMBER(r.limit_value)) * 100, 2), '990.00') || ' %' AS uso_pct
+FROM 
+    gv$resource_limit r
+JOIN 
+    gv$instance i ON r.inst_id = i.inst_id
+WHERE 
+    r.resource_name IN ('processes','sessions')
+ORDER BY 
+    i.instance_name, r.resource_name;
+!date
+
+
+

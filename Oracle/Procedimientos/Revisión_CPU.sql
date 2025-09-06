@@ -353,3 +353,29 @@ AND   s.sql_hash_value = q.hash_value(+);
 
 
 
+# entra al nodo
+ssh bdprbo1-tkuuw
+
+# sello de tiempo y carga
+date; hostname; uptime    # 1m/5m/15m
+
+# visión rápida de procesos y CPU
+top -b -n 1 | head -n 30
+
+# cola de ejecución / bloqueos / I/O wait (10 seg)
+vmstat 1 10               # columnas: r (run), b (bloqueados), us sy id wa st
+
+# CPU por core (5 seg)
+mpstat -P ALL 1 5
+
+# procesos por CPU, memoria, estado y "wchan" (qué esperan)
+ps -eo pid,ppid,stat,comm,wchan:32,pcpu,pmem,args --sort=-pcpu | head -n 30
+
+# I/O de discos/dispositivos (5 seg)
+iostat -xz 1 5
+
+# red (5 seg)
+sar -n DEV 1 5
+
+# kernel / errores recientes
+dmesg -T | tail -n 50

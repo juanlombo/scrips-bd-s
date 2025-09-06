@@ -307,6 +307,7 @@ JOIN v$logfile f ON l.group# = f.group#;
 
 SHOW PARAMETER log_archive_dest;
 
+/u02/app/oracle/diag/rdbms/ckprdg/CKPR1/trace
 
 -- Consulta 2: Obtener información de ALERT.LOG
 
@@ -314,6 +315,8 @@ SELECT value FROM V$DIAG_INFO;
 
 SELECT value FROM V$DIAG_INFO;
 
+
+select 'tail -3000f '||value||'/alert_'||sys_context('userenv','instance_name')||'.log' from v$diag_info a where NAME='Diag Trace';
 
 
 # Ver el alert log de cada nodo (reemplazá ORACLE_BASE si es diferente)

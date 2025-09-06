@@ -20,7 +20,7 @@ db2top--a
 /* pegamos el id*/
 /* vemos la sentencia que ejecuta la sesión */
 /* y si tenemos autorización finalizamos la sesión */
-db2 "force application (56915)" 
+db2 "force application (27959)" 
 
 
 +=======================================+

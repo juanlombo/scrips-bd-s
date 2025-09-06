@@ -18,3 +18,6 @@ ORDER BY LAST_DDL_TIME;
 --WHERE STATUS != 'VALID'
 --and owner not in ('OLAPSYS', 'SYS','SYSTEM','ORDDATA','MDSYS','SYS_CONSULTA','SMARTLOGIC','SYSMAN','PUBLIC','APEX_030200','PERFSTAT' )
 --ORDER BY LAST_DDL_TIME;
+
+
+select owner, object_name, object_type, status FROM dba_objects where status='INVALID';

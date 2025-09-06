@@ -15,6 +15,10 @@
         wevtutil qe System /q:"*[System[(EventID=6006 or EventID=6005 or EventID=6008 or EventID=1074)]]" /f:text /c:10
 
 
+wevtutil qe System ^
+  /q:"*[System[(EventID=41 or EventID=6005 or EventID=6006 or EventID=6008 or EventID=1074 or EventID=1076 or EventID=12 or EventID=13) and TimeCreated[timediff(@SystemTime) <= 86400000]]]" ^
+  /f:text /rd:true /c:50
+
 +======================================================================+
 |			 PRITECCION CAMBIAN DE RUTA NTAZURE62          |
 +======================================================================+

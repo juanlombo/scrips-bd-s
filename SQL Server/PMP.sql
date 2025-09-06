@@ -207,3 +207,7 @@ GO
 
 DROP DATABASE ExtensaCardio_20250708;
 GO
+
+
+
+select size/128 Tamaño,fileproperty(name,'spaceused')/128 Ocupado,name Nombre, type_desc Tipo, physical_name Ruta_Fisica, state_desc Estado from sys.database_files
